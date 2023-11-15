@@ -1,0 +1,596 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9DB4D933E3E79C1978CAE447 /* Pods-SudoDIEdgeAgentExample-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 77E87FC16BF039D856B38C5D /* Pods-SudoDIEdgeAgentExample-metadata.plist */; };
+		BEF259471225F3660C9C3EAD /* Pods_SudoDIEdgeAgentExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE4CBAEE9AA7BB2752C9A93 /* Pods_SudoDIEdgeAgentExample.framework */; };
+		CE09F7342AF2E4FD006A7EF6 /* CredentialExchangeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE09F7332AF2E4FD006A7EF6 /* CredentialExchangeViewModel.swift */; };
+		CE09F7362AF3EACD006A7EF6 /* CredentialListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE09F7352AF3EACD006A7EF6 /* CredentialListView.swift */; };
+		CE09F7382AF3EADA006A7EF6 /* CredentialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE09F7372AF3EADA006A7EF6 /* CredentialView.swift */; };
+		CE09F73A2AF3EAF7006A7EF6 /* CredentialListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE09F7392AF3EAF7006A7EF6 /* CredentialListViewModel.swift */; };
+		CE09F73C2AF3F527006A7EF6 /* ProofExchangeListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE09F73B2AF3F527006A7EF6 /* ProofExchangeListViewModel.swift */; };
+		CE09F73E2AF3F543006A7EF6 /* ProofExchangeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE09F73D2AF3F543006A7EF6 /* ProofExchangeListView.swift */; };
+		CE09F7402AF3FBB8006A7EF6 /* ProofExchangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE09F73F2AF3FBB8006A7EF6 /* ProofExchangeView.swift */; };
+		CE09F7442AF427C6006A7EF6 /* ProofExchangeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE09F7432AF427C6006A7EF6 /* ProofExchangeViewModel.swift */; };
+		CE09F7462AF59B80006A7EF6 /* CredentialForItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE09F7452AF59B80006A7EF6 /* CredentialForItemView.swift */; };
+		CE12466A2AE2F9440042EC91 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1246692AE2F9440042EC91 /* HomeViewModel.swift */; };
+		CE1246722AE7149D0042EC91 /* ConnectionExchangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1246712AE7149D0042EC91 /* ConnectionExchangeView.swift */; };
+		CE1246742AE716A10042EC91 /* ConnectionExchangeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1246732AE716A10042EC91 /* ConnectionExchangeViewModel.swift */; };
+		CE1246772AE860E00042EC91 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = CE1246762AE860E00042EC91 /* CodeScanner */; };
+		CE6B835D2AE9735E002D5B7F /* SudoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B835C2AE9735E002D5B7F /* SudoManager.swift */; };
+		CE6B835F2AE9A12E002D5B7F /* RelayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B835E2AE9A12E002D5B7F /* RelayManager.swift */; };
+		CE6B83B12AF18DE6002D5B7F /* ConnectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B83B02AF18DE6002D5B7F /* ConnectionViewModel.swift */; };
+		CE6B83B32AF18E2F002D5B7F /* ConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B83B22AF18E2F002D5B7F /* ConnectionView.swift */; };
+		CE6B83B52AF2B2DC002D5B7F /* CredentialExchangeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B83B42AF2B2DC002D5B7F /* CredentialExchangeListView.swift */; };
+		CE6B83B72AF2B374002D5B7F /* CredentialExchangeListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B83B62AF2B374002D5B7F /* CredentialExchangeListViewModel.swift */; };
+		CE6B83B92AF2B3FF002D5B7F /* CredentialExchangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B83B82AF2B3FF002D5B7F /* CredentialExchangeView.swift */; };
+		CEC416642AD88A90001A3CFD /* SudoDIEdgeAgentExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC416632AD88A90001A3CFD /* SudoDIEdgeAgentExampleApp.swift */; };
+		CEC416682AD88A90001A3CFD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEC416672AD88A90001A3CFD /* Assets.xcassets */; };
+		CEC4166B2AD88A90001A3CFD /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEC4166A2AD88A90001A3CFD /* Preview Assets.xcassets */; };
+		CEC4167A2ADEF418001A3CFD /* Clients.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC416792ADEF418001A3CFD /* Clients.swift */; };
+		CEC4167C2ADF0171001A3CFD /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC4167B2ADF0171001A3CFD /* RegisterView.swift */; };
+		CEC4167E2ADF21E1001A3CFD /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC4167D2ADF21E1001A3CFD /* HomeView.swift */; };
+		CEC416802ADF2313001A3CFD /* RegisterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC4167F2ADF2313001A3CFD /* RegisterViewModel.swift */; };
+		CEC416822ADF27AA001A3CFD /* Authenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC416812ADF27AA001A3CFD /* Authenticator.swift */; };
+		CEC416872AE07695001A3CFD /* HelperUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC416862AE07695001A3CFD /* HelperUtils.swift */; };
+		CEC4168B2AE1BFCB001A3CFD /* genesis_ledger.json in Resources */ = {isa = PBXBuildFile; fileRef = CEC4168A2AE1BFCB001A3CFD /* genesis_ledger.json */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1BE4CBAEE9AA7BB2752C9A93 /* Pods_SudoDIEdgeAgentExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SudoDIEdgeAgentExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		205F0E1793F95D3107EAE503 /* Pods-SudoDIEdgeAgentExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SudoDIEdgeAgentExample.debug.xcconfig"; path = "Target Support Files/Pods-SudoDIEdgeAgentExample/Pods-SudoDIEdgeAgentExample.debug.xcconfig"; sourceTree = "<group>"; };
+		77E87FC16BF039D856B38C5D /* Pods-SudoDIEdgeAgentExample-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SudoDIEdgeAgentExample-metadata.plist"; sourceTree = "<group>"; };
+		CA23E8500ECB5572C969073B /* Pods-SudoDIEdgeAgentExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SudoDIEdgeAgentExample.release.xcconfig"; path = "Target Support Files/Pods-SudoDIEdgeAgentExample/Pods-SudoDIEdgeAgentExample.release.xcconfig"; sourceTree = "<group>"; };
+		CE09F7332AF2E4FD006A7EF6 /* CredentialExchangeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialExchangeViewModel.swift; sourceTree = "<group>"; };
+		CE09F7352AF3EACD006A7EF6 /* CredentialListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialListView.swift; sourceTree = "<group>"; };
+		CE09F7372AF3EADA006A7EF6 /* CredentialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialView.swift; sourceTree = "<group>"; };
+		CE09F7392AF3EAF7006A7EF6 /* CredentialListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialListViewModel.swift; sourceTree = "<group>"; };
+		CE09F73B2AF3F527006A7EF6 /* ProofExchangeListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProofExchangeListViewModel.swift; sourceTree = "<group>"; };
+		CE09F73D2AF3F543006A7EF6 /* ProofExchangeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProofExchangeListView.swift; sourceTree = "<group>"; };
+		CE09F73F2AF3FBB8006A7EF6 /* ProofExchangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProofExchangeView.swift; sourceTree = "<group>"; };
+		CE09F7432AF427C6006A7EF6 /* ProofExchangeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProofExchangeViewModel.swift; sourceTree = "<group>"; };
+		CE09F7452AF59B80006A7EF6 /* CredentialForItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialForItemView.swift; sourceTree = "<group>"; };
+		CE1246692AE2F9440042EC91 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		CE1246712AE7149D0042EC91 /* ConnectionExchangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionExchangeView.swift; sourceTree = "<group>"; };
+		CE1246732AE716A10042EC91 /* ConnectionExchangeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionExchangeViewModel.swift; sourceTree = "<group>"; };
+		CE6B835C2AE9735E002D5B7F /* SudoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoManager.swift; sourceTree = "<group>"; };
+		CE6B835E2AE9A12E002D5B7F /* RelayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayManager.swift; sourceTree = "<group>"; };
+		CE6B83B02AF18DE6002D5B7F /* ConnectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionViewModel.swift; sourceTree = "<group>"; };
+		CE6B83B22AF18E2F002D5B7F /* ConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionView.swift; sourceTree = "<group>"; };
+		CE6B83B42AF2B2DC002D5B7F /* CredentialExchangeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialExchangeListView.swift; sourceTree = "<group>"; };
+		CE6B83B62AF2B374002D5B7F /* CredentialExchangeListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialExchangeListViewModel.swift; sourceTree = "<group>"; };
+		CE6B83B82AF2B3FF002D5B7F /* CredentialExchangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialExchangeView.swift; sourceTree = "<group>"; };
+		CEC416602AD88A90001A3CFD /* SudoDIEdgeAgentExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SudoDIEdgeAgentExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEC416632AD88A90001A3CFD /* SudoDIEdgeAgentExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoDIEdgeAgentExampleApp.swift; sourceTree = "<group>"; };
+		CEC416672AD88A90001A3CFD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CEC4166A2AD88A90001A3CFD /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		CEC416792ADEF418001A3CFD /* Clients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clients.swift; sourceTree = "<group>"; };
+		CEC4167B2ADF0171001A3CFD /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		CEC4167D2ADF21E1001A3CFD /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		CEC4167F2ADF2313001A3CFD /* RegisterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewModel.swift; sourceTree = "<group>"; };
+		CEC416812ADF27AA001A3CFD /* Authenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authenticator.swift; sourceTree = "<group>"; };
+		CEC416862AE07695001A3CFD /* HelperUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperUtils.swift; sourceTree = "<group>"; };
+		CEC4168A2AE1BFCB001A3CFD /* genesis_ledger.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = genesis_ledger.json; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CEC4165D2AD88A90001A3CFD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE1246772AE860E00042EC91 /* CodeScanner in Frameworks */,
+				BEF259471225F3660C9C3EAD /* Pods_SudoDIEdgeAgentExample.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		55465700F97B1A38CCE7E7DB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				205F0E1793F95D3107EAE503 /* Pods-SudoDIEdgeAgentExample.debug.xcconfig */,
+				CA23E8500ECB5572C969073B /* Pods-SudoDIEdgeAgentExample.release.xcconfig */,
+				77E87FC16BF039D856B38C5D /* Pods-SudoDIEdgeAgentExample-metadata.plist */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		8E8BCC03CCF369C9802A253E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1BE4CBAEE9AA7BB2752C9A93 /* Pods_SudoDIEdgeAgentExample.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CEC416572AD88A8F001A3CFD = {
+			isa = PBXGroup;
+			children = (
+				CEC416622AD88A90001A3CFD /* SudoDIEdgeAgentExample */,
+				CEC416612AD88A90001A3CFD /* Products */,
+				55465700F97B1A38CCE7E7DB /* Pods */,
+				8E8BCC03CCF369C9802A253E /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		CEC416612AD88A90001A3CFD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CEC416602AD88A90001A3CFD /* SudoDIEdgeAgentExample.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CEC416622AD88A90001A3CFD /* SudoDIEdgeAgentExample */ = {
+			isa = PBXGroup;
+			children = (
+				CEC416892AE1BFB3001A3CFD /* Resources */,
+				CEC416782ADEF395001A3CFD /* ViewModels */,
+				CEC416772ADEF38A001A3CFD /* Views */,
+				CEC416632AD88A90001A3CFD /* SudoDIEdgeAgentExampleApp.swift */,
+				CEC416672AD88A90001A3CFD /* Assets.xcassets */,
+				CEC416692AD88A90001A3CFD /* Preview Content */,
+				CEC416792ADEF418001A3CFD /* Clients.swift */,
+				CEC416812ADF27AA001A3CFD /* Authenticator.swift */,
+				CEC416862AE07695001A3CFD /* HelperUtils.swift */,
+				CE6B835C2AE9735E002D5B7F /* SudoManager.swift */,
+				CE6B835E2AE9A12E002D5B7F /* RelayManager.swift */,
+			);
+			path = SudoDIEdgeAgentExample;
+			sourceTree = "<group>";
+		};
+		CEC416692AD88A90001A3CFD /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				CEC4166A2AD88A90001A3CFD /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		CEC416772ADEF38A001A3CFD /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				CEC4167B2ADF0171001A3CFD /* RegisterView.swift */,
+				CEC4167D2ADF21E1001A3CFD /* HomeView.swift */,
+				CE1246712AE7149D0042EC91 /* ConnectionExchangeView.swift */,
+				CE6B83B22AF18E2F002D5B7F /* ConnectionView.swift */,
+				CE6B83B42AF2B2DC002D5B7F /* CredentialExchangeListView.swift */,
+				CE6B83B82AF2B3FF002D5B7F /* CredentialExchangeView.swift */,
+				CE09F7352AF3EACD006A7EF6 /* CredentialListView.swift */,
+				CE09F7372AF3EADA006A7EF6 /* CredentialView.swift */,
+				CE09F73D2AF3F543006A7EF6 /* ProofExchangeListView.swift */,
+				CE09F73F2AF3FBB8006A7EF6 /* ProofExchangeView.swift */,
+				CE09F7452AF59B80006A7EF6 /* CredentialForItemView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		CEC416782ADEF395001A3CFD /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				CEC4167F2ADF2313001A3CFD /* RegisterViewModel.swift */,
+				CE1246692AE2F9440042EC91 /* HomeViewModel.swift */,
+				CE1246732AE716A10042EC91 /* ConnectionExchangeViewModel.swift */,
+				CE6B83B02AF18DE6002D5B7F /* ConnectionViewModel.swift */,
+				CE6B83B62AF2B374002D5B7F /* CredentialExchangeListViewModel.swift */,
+				CE09F7332AF2E4FD006A7EF6 /* CredentialExchangeViewModel.swift */,
+				CE09F7392AF3EAF7006A7EF6 /* CredentialListViewModel.swift */,
+				CE09F73B2AF3F527006A7EF6 /* ProofExchangeListViewModel.swift */,
+				CE09F7432AF427C6006A7EF6 /* ProofExchangeViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		CEC416892AE1BFB3001A3CFD /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CEC4168A2AE1BFCB001A3CFD /* genesis_ledger.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CEC4165F2AD88A90001A3CFD /* SudoDIEdgeAgentExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CEC4166E2AD88A90001A3CFD /* Build configuration list for PBXNativeTarget "SudoDIEdgeAgentExample" */;
+			buildPhases = (
+				7A7B161F776F59019637B112 /* [CP] Check Pods Manifest.lock */,
+				CEC4165C2AD88A90001A3CFD /* Sources */,
+				CEC4165D2AD88A90001A3CFD /* Frameworks */,
+				CEC4165E2AD88A90001A3CFD /* Resources */,
+				8A434EC1A1BBB84784A392FF /* [CP] Embed Pods Frameworks */,
+				CEC416882AE1B531001A3CFD /* Copy Test Keys and Config */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SudoDIEdgeAgentExample;
+			packageProductDependencies = (
+				CE1246762AE860E00042EC91 /* CodeScanner */,
+			);
+			productName = SudoDIEdgeAgentExample;
+			productReference = CEC416602AD88A90001A3CFD /* SudoDIEdgeAgentExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CEC416582AD88A8F001A3CFD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					CEC4165F2AD88A90001A3CFD = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+				};
+			};
+			buildConfigurationList = CEC4165B2AD88A8F001A3CFD /* Build configuration list for PBXProject "SudoDIEdgeAgentExample" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CEC416572AD88A8F001A3CFD;
+			packageReferences = (
+				CE1246752AE860E00042EC91 /* XCRemoteSwiftPackageReference "CodeScanner" */,
+			);
+			productRefGroup = CEC416612AD88A90001A3CFD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CEC4165F2AD88A90001A3CFD /* SudoDIEdgeAgentExample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CEC4165E2AD88A90001A3CFD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEC4166B2AD88A90001A3CFD /* Preview Assets.xcassets in Resources */,
+				CEC416682AD88A90001A3CFD /* Assets.xcassets in Resources */,
+				9DB4D933E3E79C1978CAE447 /* Pods-SudoDIEdgeAgentExample-metadata.plist in Resources */,
+				CEC4168B2AE1BFCB001A3CFD /* genesis_ledger.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		7A7B161F776F59019637B112 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SudoDIEdgeAgentExample-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8A434EC1A1BBB84784A392FF /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SudoDIEdgeAgentExample/Pods-SudoDIEdgeAgentExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SudoDIEdgeAgentExample/Pods-SudoDIEdgeAgentExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SudoDIEdgeAgentExample/Pods-SudoDIEdgeAgentExample-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CEC416882AE1B531001A3CFD /* Copy Test Keys and Config */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 8;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Test Keys and Config";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"Warning: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md). TEST key registration will not work\"\n    returncode=0\nfi\n\necho \"Copy test key ID to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.id \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"Warning: Failed to copy test registration key ID. Make sure the file config/register_key.id exists in the project directory (see README.md). TEST key registration will not work\"\n    returncode=0\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\nexit ${returncode}\n\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CEC4165C2AD88A90001A3CFD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEC416872AE07695001A3CFD /* HelperUtils.swift in Sources */,
+				CE1246742AE716A10042EC91 /* ConnectionExchangeViewModel.swift in Sources */,
+				CE09F7462AF59B80006A7EF6 /* CredentialForItemView.swift in Sources */,
+				CE6B83B72AF2B374002D5B7F /* CredentialExchangeListViewModel.swift in Sources */,
+				CEC4167C2ADF0171001A3CFD /* RegisterView.swift in Sources */,
+				CE6B83B12AF18DE6002D5B7F /* ConnectionViewModel.swift in Sources */,
+				CE09F7342AF2E4FD006A7EF6 /* CredentialExchangeViewModel.swift in Sources */,
+				CE09F7442AF427C6006A7EF6 /* ProofExchangeViewModel.swift in Sources */,
+				CE6B835F2AE9A12E002D5B7F /* RelayManager.swift in Sources */,
+				CE09F7402AF3FBB8006A7EF6 /* ProofExchangeView.swift in Sources */,
+				CE09F73C2AF3F527006A7EF6 /* ProofExchangeListViewModel.swift in Sources */,
+				CE1246722AE7149D0042EC91 /* ConnectionExchangeView.swift in Sources */,
+				CEC416802ADF2313001A3CFD /* RegisterViewModel.swift in Sources */,
+				CE09F73A2AF3EAF7006A7EF6 /* CredentialListViewModel.swift in Sources */,
+				CE6B835D2AE9735E002D5B7F /* SudoManager.swift in Sources */,
+				CE12466A2AE2F9440042EC91 /* HomeViewModel.swift in Sources */,
+				CEC4167E2ADF21E1001A3CFD /* HomeView.swift in Sources */,
+				CE6B83B92AF2B3FF002D5B7F /* CredentialExchangeView.swift in Sources */,
+				CE09F7382AF3EADA006A7EF6 /* CredentialView.swift in Sources */,
+				CE6B83B32AF18E2F002D5B7F /* ConnectionView.swift in Sources */,
+				CEC416642AD88A90001A3CFD /* SudoDIEdgeAgentExampleApp.swift in Sources */,
+				CE09F7362AF3EACD006A7EF6 /* CredentialListView.swift in Sources */,
+				CEC4167A2ADEF418001A3CFD /* Clients.swift in Sources */,
+				CE6B83B52AF2B2DC002D5B7F /* CredentialExchangeListView.swift in Sources */,
+				CE09F73E2AF3F543006A7EF6 /* ProofExchangeListView.swift in Sources */,
+				CEC416822ADF27AA001A3CFD /* Authenticator.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		CEC4166C2AD88A90001A3CFD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CEC4166D2AD88A90001A3CFD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CEC4166F2AD88A90001A3CFD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 205F0E1793F95D3107EAE503 /* Pods-SudoDIEdgeAgentExample.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SudoDIEdgeAgentExample/Preview Content\"";
+				DEVELOPMENT_TEAM = NXFX4P9CC7;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Used for scanning QR codes.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.example.SudoDIEdgeAgent;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CEC416702AD88A90001A3CFD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CA23E8500ECB5572C969073B /* Pods-SudoDIEdgeAgentExample.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SudoDIEdgeAgentExample/Preview Content\"";
+				DEVELOPMENT_TEAM = NXFX4P9CC7;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Used for scanning QR codes.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.example.SudoDIEdgeAgent;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CEC4165B2AD88A8F001A3CFD /* Build configuration list for PBXProject "SudoDIEdgeAgentExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEC4166C2AD88A90001A3CFD /* Debug */,
+				CEC4166D2AD88A90001A3CFD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CEC4166E2AD88A90001A3CFD /* Build configuration list for PBXNativeTarget "SudoDIEdgeAgentExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEC4166F2AD88A90001A3CFD /* Debug */,
+				CEC416702AD88A90001A3CFD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CE1246752AE860E00042EC91 /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twostraws/CodeScanner";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CE1246762AE860E00042EC91 /* CodeScanner */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CE1246752AE860E00042EC91 /* XCRemoteSwiftPackageReference "CodeScanner" */;
+			productName = CodeScanner;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = CEC416582AD88A8F001A3CFD /* Project object */;
+}
