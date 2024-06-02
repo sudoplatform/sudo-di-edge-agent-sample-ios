@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
+import SudoDIEdgeAgent
 import SwiftUI
 
 struct ConnectionView: View {
@@ -20,10 +21,25 @@ struct ConnectionView: View {
                 } else {
                     List {
                         ForEach(viewModel.connections.sorted { $0.createdAt ?? .now > $1.createdAt ?? .now }) { connection in
-                            VStack(alignment: .leading) {
-                                Text(connection.theirLabel ?? "")
-                                Text(connection.id)
-                            }
+                            NavigationLink(
+                                destination: {
+                                    ConnectionChatView(
+                                        viewModel: .init(
+                                            connection: connection
+                                        )
+                                    )
+                                },
+                                label: {
+                                    HStack {
+                                        VStack(alignment: .leading) {
+                                            Text(connection.theirLabel ?? "")
+                                            Text(connection.id)
+                                        }
+                                        Spacer()
+                                        Image(systemName: "message")
+                                    }
+                                }
+                            )
                         }
                         .onDelete(perform: viewModel.delete)
                     }
@@ -56,7 +72,21 @@ struct ConnectionView: View {
 
 struct ConnectionView_Previews: PreviewProvider {
     static var previews: some View {
-        ConnectionView()
+        ConnectionView(viewModel: .init(
+            connections: [
+                Connection(
+                    connectionId: "1",
+                    connectionExchangeId: "1",
+                    theirLabel: "Foo",
+                    tags: []
+                ),
+                Connection(
+                    connectionId: "2",
+                    connectionExchangeId: "1",
+                    theirLabel: "Bar",
+                    tags: []
+                )
+            ]
+        ))
     }
 }
-

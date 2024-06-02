@@ -23,7 +23,8 @@ struct CredentialListView: View {
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text(credential.credentialId)
-                                    Text(credential.credentialMetadata.credentialDefinitionInfo?.name ?? "")
+                                    Text(credential.formatData.previewName)
+                                    Text(credential.formatData.formatPreviewName)
                                 }
                                 Spacer()
 

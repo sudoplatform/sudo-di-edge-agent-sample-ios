@@ -27,7 +27,8 @@ struct CredentialExchangeListView: View {
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text(exchange.credentialExchangeId)
-                                    Text(exchange.credentialMetadata.credentialDefinitionInfo?.name ?? "")
+                                    Text(exchange.formatData.previewName)
+                                    Text(exchange.formatData.formatPreviewName)
                                     Text(viewModel.getState(exchange.state))
                                 }
                                 Spacer()

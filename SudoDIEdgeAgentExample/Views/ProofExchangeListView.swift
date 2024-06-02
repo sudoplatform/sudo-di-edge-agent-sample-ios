@@ -67,7 +67,12 @@ struct PresentButtonView: View {
     var body: some View {
         if proof.state == .request {
             NavigationLink("Present") {
-                ProofExchangeView(viewModel: .init(proof: proof))
+                switch proof.formatData {
+                case .indy:
+                    AnoncredProofExchangeView(viewModel: .init(proof: proof))
+                case .dif:
+                    DifProofExchangeView(viewModel: .init(proof: proof))
+                }
             }
             .frame(maxWidth: 85)
             .padding()

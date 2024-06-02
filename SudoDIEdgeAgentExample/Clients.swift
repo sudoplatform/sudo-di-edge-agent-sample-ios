@@ -68,7 +68,10 @@ class Clients {
         mutliMessageSource.addMessageSource(messageSource: relaySource)
         mutliMessageSource.addMessageSource(messageSource: messageSource)
 
-        self.agentConfiguration = AgentConfiguration(genesisFiles: [genesisFile])
+        self.agentConfiguration = AgentConfiguration(
+            genesisFiles: [genesisFile],
+            peerConnectionConfiguration: PeerConnectionConfiguration(label: "Sudo DI Agent iOS")
+        )
         self.agent = try SudoDIEdgeAgentBuilder()
             .setAgentConfiguration(agentConfiguration: self.agentConfiguration)
             .build()

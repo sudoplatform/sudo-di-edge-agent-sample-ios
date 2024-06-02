@@ -7,33 +7,33 @@
 import SwiftUI
 import SudoDIEdgeAgent
 
-struct ProofExchangeView: View {
+struct AnoncredProofExchangeView: View {
     // SwiftUI doesn't make it easy to dismiss/pop views so one way is to use the `@Environment(.\dismiss).
     @Environment(\.dismiss) private var dismiss
     
-    @StateObject var viewModel: ProofExchangeViewModel
+    @StateObject var viewModel: AnoncredProofExchangeViewModel
 
     var body: some View {
         NavigationStack {
             Spacer()
             VStack {
-                BoldedLineItem(name: "ID: ", value: viewModel.proof.proofExchangeId)
-                BoldedLineItem(name: "From Connection: ", value: viewModel.proof.connectionId)
+                BoldedLineItem(name: "ID", value: viewModel.proof.proofExchangeId)
+                BoldedLineItem(name: "From Connection", value: viewModel.proof.connectionId)
                 Divider()
                 List {
-                    if !viewModel.attributes.isEmpty {
+                    if !viewModel.anoncredProofRequest.requestedAttributes.isEmpty {
                         Section {
                             Text("Requested Attributes")
                         }
                             .frame(maxWidth: .infinity)
-                        ForEach(viewModel.attributes) { attribute in
+                        ForEach(Array(viewModel.anoncredProofRequest.requestedAttributes), id: \.key) { referent, info in
                             HStack {
-                                Text(attribute.groupAttributes.sorted().joined(separator: ", "))
+                                Text(info.groupAttributes.sorted().joined(separator: ", "))
                                 Spacer()
                                 Button {
-                                    viewModel.attributeSelected(attribute, for: attribute.groupAttributes)
+                                    viewModel.startSelectingCredentialForAttributeGroup(referent)
                                 } label: {
-                                    viewModel.attributeCredentials[attribute.groupIdentifier] == ""
+                                    viewModel.selectedCredentialsForAttributeGroups[referent] == ""
                                     ? Text("Select")
                                     : Text("Reselect")
                                 }
@@ -46,20 +46,20 @@ struct ProofExchangeView: View {
                         }
                     }
 
-                    if !viewModel.predicates.isEmpty {
+                    if !viewModel.anoncredProofRequest.requestedPredicates.isEmpty {
                         Section {
                             Text("Requested Predicates")
                         }
                             .frame(maxWidth: .infinity)
-                        ForEach(viewModel.predicates) { predicate in
+                        ForEach(Array(viewModel.anoncredProofRequest.requestedPredicates), id: \.key) { referent, info in
                             HStack {
-                                Text(predicate.predicateIdentifier)
-                                Text(viewModel.formatPredicate(predicate))
+                                Text(referent)
+                                Text(viewModel.formatPredicate(info))
                                 Spacer()
                                 Button {
-                                    viewModel.predicateSelected(predicate)
+                                    viewModel.startSelectingCredentialForPredicate(referent)
                                 } label: {
-                                    viewModel.attributeCredentials[predicate.predicateIdentifier] == ""
+                                    viewModel.selectedCredentialsForPredicates[referent] == ""
                                     ? Text("Select")
                                     : Text("Reselect")
                                 }
@@ -95,8 +95,11 @@ struct ProofExchangeView: View {
             } message: {
                 Text("The proof was successfully presented.")
             }
-            .sheet(item: $viewModel.presentation) { presentation in
-                CredentialForItemView(presentation: presentation, selectedCred: viewModel.setCredential)
+            .sheet(item: $viewModel.selectingCredentialsForItem) { item in
+                SelectCredentialForAnoncredItemView(
+                    item: item,
+                    onSelectCredential: viewModel.selectCredentialForReferent
+                )
             }
         }
     }
@@ -104,11 +107,18 @@ struct ProofExchangeView: View {
 
 struct ProofExchangeView_Previews: PreviewProvider {
     static var previews: some View {
-        ProofExchangeView(viewModel: .init(proof: .init(
+        AnoncredProofExchangeView(viewModel: .init(proof: .init(
             proofExchangeId: "proofExchangeId",
             connectionId: "connectionId",
             initiator: .internal,
             state: .presented,
+            formatData: .indy(proofRequest: AnoncredProofRequestInfo(
+                name: "Proof Req",
+                version: "1.0",
+                requestedAttributes: [:],
+                requestedPredicates: [:],
+                nonRevoked: nil
+            )),
             errorMessage: nil, tags: [
                 .init(name: "~created_timestamp", value: "1698891059")
             ])

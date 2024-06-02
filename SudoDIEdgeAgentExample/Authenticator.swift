@@ -4,9 +4,9 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-import SudoUser
 import SudoKeyManager
-//import AuthenticationServices
+import SudoUser
+// import AuthenticationServices
 
 enum AuthenticatorError: LocalizedError {
     case registerFailed
@@ -25,7 +25,6 @@ enum AuthenticatorError: LocalizedError {
 }
 
 class Authenticator {
-
     let userClient: SudoUserClient
     let keyManager: SudoKeyManager
 
@@ -83,28 +82,26 @@ class Authenticator {
         }
     }
 
-
     func registerAndSignIn() async throws {
         let userClient: SudoUserClient = Clients.userClient
 
         func signIn() async throws {
             if try await !userClient.isSignedIn() {
                 _ = try await userClient.signInWithKey()
-                self.lastSignInMethod = .test
+                lastSignInMethod = .test
             }
         }
 
         if try await !userClient.isRegistered() {
-            try await self.register()
+            try await register()
         }
 
         try await signIn()
     }
 
     func deregister() async throws -> String {
-        let deregisteredUserId = try await self.userClient.deregister()
-        self.lastSignInMethod = .unknown
+        let deregisteredUserId = try await userClient.deregister()
+        lastSignInMethod = .unknown
         return deregisteredUserId
     }
 }
-

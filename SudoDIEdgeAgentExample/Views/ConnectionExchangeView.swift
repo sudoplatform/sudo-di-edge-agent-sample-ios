@@ -34,7 +34,7 @@ struct ConnectionExchangeView: View {
                                 }
                                 Spacer()
 
-                                if connection.state == .invitation {
+                                if connection.state == .invitation && connection.role == .invitee {
                                     Button("Accept") {
                                         viewModel.accept(connection.connectionExchangeId)
                                     }
@@ -68,6 +68,19 @@ struct ConnectionExchangeView: View {
                 Button("Accept Invitation") {
                     viewModel.isPresentingScanner = true
                 }
+                    .padding()
+                    .frame(width: 200)
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                    .clipShape(Capsule())
+                    .disabled(viewModel.isLoading)
+                
+                    NavigationLink("Create Invitation") {
+                        ConnectionInvitationCreateView(
+                            viewModel: .init()
+                        )
+                    }
+                
                     .padding()
                     .frame(width: 200)
                     .background(.blue)

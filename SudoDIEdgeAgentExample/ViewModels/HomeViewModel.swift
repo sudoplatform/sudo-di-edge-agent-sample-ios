@@ -43,7 +43,7 @@ class HomeViewModel: ObservableObject {
                 } catch {
                     if let error = error as? SudoDIEdgeAgentError.AgentRunError {
                         switch error {
-                        case .agentAlreadyRunningError(_):
+                        case .agentAlreadyRunningError:
                             NSLog("Agent is already running, ignoring request...")
                         default:
                             break

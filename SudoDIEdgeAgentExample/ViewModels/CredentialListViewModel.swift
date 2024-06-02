@@ -88,3 +88,23 @@ extension Credential {
             .flatMap { Date(timeIntervalSince1970: $0) }
     }
 }
+
+extension CredentialFormatData {
+    var previewName: String {
+        switch self {
+        case .w3c(let w3cCred):
+            return w3cCred.types.first { $0 != "VerifiableCredential" } ?? "VerifiableCredential"
+        case .anoncredV1(let metadata, _):
+            return metadata.credentialDefinitionInfo?.name ?? metadata.credentialDefinitionId
+        }
+    }
+    
+    var formatPreviewName: String {
+        switch self {
+        case .anoncredV1:
+            return "Anoncred"
+        case .w3c:
+            return "W3C"
+        }
+    }
+}

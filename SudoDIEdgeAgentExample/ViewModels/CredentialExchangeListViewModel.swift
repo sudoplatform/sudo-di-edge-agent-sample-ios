@@ -66,9 +66,16 @@ class CredentialExchangeListViewModel: ObservableObject {
         Task { @MainActor in
             isLoading = true
             do {
+                let holderDid = try await idempotentCreateHolderDidKey(agent: Clients.agent)
+
                 // An offer requires a configuration to adjust how to store the credential
                 // which in this cause is left to the defaults.
-                let configuration = AcceptCredentialOfferConfiguration(autoStoreCredential: true)
+                let configuration = AcceptCredentialOfferConfiguration(
+                    autoStoreCredential: true,
+                    formatSpecificConfiguration: .ariesLdProofVc(
+                        overrideCredentialSubjectId: holderDid
+                    )
+                )
 
                 guard let credential = presentedExchange else {
                     NSLog("Missing credential")
@@ -162,6 +169,10 @@ class CredentialSubscriber: AgentEventSubscriber {
     func proofExchangeStateChanged(proofExchange: ProofExchange) {
         // no-op
     }
+    
+    func inboundBasicMessage(basicMessage: BasicMessage.Inbound) {
+        // no-op
+    }
 
     func messageProcessed(messageId: String) {
         // no-op
@@ -181,5 +192,45 @@ extension CredentialExchange {
             .first { $0.name == "~created_timestamp" }
             .flatMap { Double($0.value) }
             .flatMap { Date(timeIntervalSince1970: $0) }
+    }
+}
+
+/// Creates an Ed25519 DID:KEY if one does not already exist.
+///
+/// Returns the new or existing did:key DID
+private func idempotentCreateHolderDidKey(agent: SudoDIEdgeAgent) async throws -> String {
+    let dids = try await agent.dids.listAll(
+        options: ListDidsOptions(filters: ListDidsFilters(method: .didKey))
+    )
+    let existingDid = dids.first
+    
+    if let did = existingDid?.did {
+        return did
+    }
+    
+    let newDid = try await agent.dids.createDid(
+        options: .didKey(keyType: .ed25519)
+    )
+    return newDid.did
+}
+
+extension CredentialExchangeFormatData {
+    var previewName: String {
+        switch self {
+        case .ariesLdProof(let w3cCred, _):
+            return w3cCred.types.first { $0 != "VerifiableCredential" } ?? "VerifiableCredential"
+        case .indy(let metadata, _):
+            return metadata.credentialDefinitionInfo?.name ?? metadata.credentialDefinitionId
+        }
+    }
+    
+    var formatPreviewName: String {
+        switch self {
+            
+        case .indy:
+            return "Anoncred"
+        case .ariesLdProof:
+            return "W3C"
+        }
     }
 }

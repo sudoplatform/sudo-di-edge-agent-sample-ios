@@ -112,6 +112,10 @@ class ProofSubscriber: AgentEventSubscriber {
             viewModel.refresh()
         }
     }
+    
+    func inboundBasicMessage(basicMessage: BasicMessage.Inbound) {
+        // no-op
+    }
 
     func messageProcessed(messageId: String) {
         // no-op

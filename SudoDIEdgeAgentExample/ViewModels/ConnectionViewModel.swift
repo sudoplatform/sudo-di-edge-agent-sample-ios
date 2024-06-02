@@ -10,19 +10,29 @@ import SudoDIEdgeAgent
 class ConnectionViewModel: ObservableObject {
 
     /// Shows when the list is loading
-    @Published var isLoading: Bool = false
+    @Published var isLoading: Bool
 
     /// Shows when there is an error
-    @Published var showAlert: Bool = false
+    @Published var showAlert: Bool
 
     /// The message to show in the alert
-    @Published var alertMessage: String = ""
+    @Published var alertMessage: String
 
     /// The list of connections from the agent
-    @Published var connections: [Connection] = []
+    @Published var connections: [Connection]
 
     // Empty initializer
-    init() {}
+    init(
+        isLoading: Bool = false,
+        showAlert: Bool = false,
+        alertMessage: String = "", 
+        connections: [Connection] = []
+    ) {
+        self.isLoading = isLoading
+        self.showAlert = showAlert
+        self.alertMessage = alertMessage
+        self.connections = connections
+    }
 
     /// Loads or refreshes the current connections
     func refresh() {

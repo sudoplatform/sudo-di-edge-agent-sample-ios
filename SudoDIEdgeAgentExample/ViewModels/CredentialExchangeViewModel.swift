@@ -18,9 +18,9 @@ class CredentialExchangeViewModel: ObservableObject {
     }
 }
 
-/// Conforms `CredentialAttribute` to `Hashable` by combining all attributes together to
+/// Conforms `AnoncredV1CredentialAttribute` to `Hashable` by combining all attributes together to
 /// create a unique value. This is done here because the extension is outside of the Edge SDK where this is declared.
-extension CredentialAttribute: Hashable {
+extension AnoncredV1CredentialAttribute: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(name)
         hasher.combine(value)

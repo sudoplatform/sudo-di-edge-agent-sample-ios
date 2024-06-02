@@ -77,11 +77,10 @@ class ConnectionExchangeViewModel: ObservableObject {
                 let postbox = try await Clients.relayManager.createPostbox(connectionId: exchangeId)
                 /// Get the routing for the relay service to communicate
                 let relayRouting = SudoDIRelayMessageSource.routingFromPostbox(postbox: postbox)
-                let configuration = ConnectionConfiguration()
                 _ = try await Clients.agent.connections.exchange.acceptConnection(
                     connectionExchangeId: exchangeId,
                     routing: relayRouting,
-                    configuration: configuration
+                    configuration: nil
                 )
                 refresh()
                 showSuccessAlert = true
@@ -181,7 +180,7 @@ class ConnectionSubscriber: AgentEventSubscriber {
             NSLog("Connection exchange state change for \(connectionExchange.connectionExchangeId): \(connectionExchange.state)")
             viewModel.refresh()
             // Only present the connection exchange if it is an invitation
-            if connectionExchange.state == .invitation {
+            if connectionExchange.state == .invitation && connectionExchange.role == .invitee {
                 viewModel.incomingExchange = connectionExchange
             }
         }
@@ -193,6 +192,10 @@ class ConnectionSubscriber: AgentEventSubscriber {
     }
 
     func proofExchangeStateChanged(proofExchange: ProofExchange) {
+        // no-op
+    }
+    
+    func inboundBasicMessage(basicMessage: BasicMessage.Inbound) {
         // no-op
     }
 
