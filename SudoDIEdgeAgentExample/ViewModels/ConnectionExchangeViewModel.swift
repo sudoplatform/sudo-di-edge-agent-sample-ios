@@ -57,8 +57,8 @@ class ConnectionExchangeViewModel: ObservableObject {
         Task { @MainActor in
             isLoading = true
             do {
-                let connections = try await Clients.agent.connections.exchange.listAll(options: nil)
-                exchanges = connections
+                let result = try await Clients.agent.connections.exchange.listAll(options: nil)
+                exchanges = result.sorted { $0.startedAt ?? .now > $1.startedAt ?? .now }
             } catch {
                 NSLog("Failed to list all connection exchanges \(error.localizedDescription)")
             }
@@ -66,8 +66,8 @@ class ConnectionExchangeViewModel: ObservableObject {
         }
     }
 
-    /// Method for accepting a `ConnectionExchange`
-    func accept(_ exchangeId: String) {
+    /// Method for accepting a `ConnectionExchange` by establishing a new connection
+    func acceptNewConnection(_ exchangeId: String) {
         Task { @MainActor in
             isLoading = true
             do {
@@ -79,8 +79,7 @@ class ConnectionExchangeViewModel: ObservableObject {
                 let relayRouting = SudoDIRelayMessageSource.routingFromPostbox(postbox: postbox)
                 _ = try await Clients.agent.connections.exchange.acceptConnection(
                     connectionExchangeId: exchangeId,
-                    routing: relayRouting,
-                    configuration: nil
+                    configuration: .newConnection(routing: relayRouting)
                 )
                 refresh()
                 showSuccessAlert = true
@@ -92,7 +91,31 @@ class ConnectionExchangeViewModel: ObservableObject {
             }
             isLoading = false
         }
-        
+    }
+    
+    /// Method for accepting a `ConnectionExchange` by reusing an existing connection.
+    ///
+    /// This is possible when the invitation uses the same inviter DID that this agent
+    /// has previously connected with, saving the effort/resources of creating a new connection.
+    func tryReuseConnection(_ exchangeId: String, with connectionId: String) {
+        Task { @MainActor in
+            isLoading = true
+            do {
+                NSLog("Reusing connection...")
+                incomingExchange = nil
+                _ = try await Clients.agent.connections.exchange.acceptConnection(
+                    connectionExchangeId: exchangeId,
+                    configuration: .reuseExistingConnection(connectionId: connectionId)
+                )
+                refresh()
+                showSuccessAlert = true
+            } catch {
+                NSLog("Error reusing connection: \(error.localizedDescription)")
+                alertMessage = error.localizedDescription
+                showAlert = true
+            }
+            isLoading = false
+        }
     }
 
     /// Method for swiping to delete a connection exchange
@@ -140,6 +163,8 @@ class ConnectionExchangeViewModel: ObservableObject {
             return "Invitation"
         case .request:
             return "Request"
+        case .reuseRequest:
+            return "Reuse Requested"
         case .complete:
             return "Complete"
         case .response:
@@ -207,4 +232,15 @@ class ConnectionSubscriber: AgentEventSubscriber {
 // Extend `ConnectionExchange` to `Identifiable` for convenience in the View
 extension ConnectionExchange: Identifiable {
     public var id: String { self.connectionExchangeId }
+}
+
+/// Convenience to get the `started_timestamp`
+extension ConnectionExchange {
+    /// The date value retrieved from the `~started_timestamp` in the tags property
+    var startedAt: Date? {
+        return self.tags
+            .first { $0.name == "~started_timestamp" }
+            .flatMap { Double($0.value) }
+            .flatMap { Date(timeIntervalSince1970: $0) }
+    }
 }

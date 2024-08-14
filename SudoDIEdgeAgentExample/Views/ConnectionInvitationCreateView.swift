@@ -127,10 +127,12 @@ struct ConnectionInvitationCreateView3_Previews: PreviewProvider {
             incomingRequest: ConnectionExchange(
                 connectionExchangeId: "connEx1",
                 connectionId: nil,
+                reusableConnectionIds: [],
                 role: .inviter,
                 state: .request,
+                did: "",
+                theirDid: "",
                 theirLabel: "Bob",
-                verkey: "",
                 errorMessage: nil,
                 tags: []
             )

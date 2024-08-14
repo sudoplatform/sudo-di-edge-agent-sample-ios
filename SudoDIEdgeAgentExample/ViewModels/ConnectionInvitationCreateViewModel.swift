@@ -71,9 +71,7 @@ class ConnectionInvitationCreateViewModel: ObservableObject {
                     routingVerkeys: []
                 )
                 let createdInvite = try await Clients.agent.connections.exchange.createInvitation(
-                    configuration: .legacyPairwise(
-                        routing: newRouting
-                    )
+                    configuration: .pairwise(routing: newRouting)
                 )
                 createdInvitationUrl = createdInvite.invitationUrl
                 createdConnectionExchangeId = createdInvite.exchange.connectionExchangeId
@@ -99,8 +97,7 @@ class ConnectionInvitationCreateViewModel: ObservableObject {
                 
                 _ = try await Clients.agent.connections.exchange.acceptConnection(
                     connectionExchangeId: createdConnectionExchangeId!,
-                    routing: routing!,
-                    configuration: nil
+                    configuration: .newConnection(routing: routing!)
                 )
                 
                 incomingRequest = nil

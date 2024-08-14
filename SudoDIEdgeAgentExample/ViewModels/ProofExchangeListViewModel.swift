@@ -47,7 +47,7 @@ class ProofExchangeListViewModel: ObservableObject {
             isLoading = true
             do {
                 let result = try await Clients.agent.proofs.exchange.listAll(options: nil)
-                exchanges = result
+                exchanges = result.sorted { $0.startedAt ?? .now > $1.startedAt ?? .now }
             } catch {
                 NSLog("Error getting credential exchanges \(error.localizedDescription)")
                 showAlert = true
@@ -84,6 +84,8 @@ class ProofExchangeListViewModel: ObservableObject {
             return "Presented"
         case .acked:
             return "Acked"
+        case .abandoned:
+            return "Abadoned"
         }
     }
 }
@@ -125,4 +127,15 @@ class ProofSubscriber: AgentEventSubscriber {
 /// Conforms to Identifiable to provide some Swift magic for the `ForEach`
 extension ProofExchange: Identifiable {
     public var id: String { self.proofExchangeId }
+}
+
+/// Convenience to get the `started_timestamp`
+extension ProofExchange {
+    /// The date value retrieved from the `~started_timestamp` in the tags property
+    var startedAt: Date? {
+        return self.tags
+            .first { $0.name == "~started_timestamp" }
+            .flatMap { Double($0.value) }
+            .flatMap { Date(timeIntervalSince1970: $0) }
+    }
 }

@@ -40,7 +40,7 @@ class ConnectionViewModel: ObservableObject {
             isLoading = true
             do {
                 let result = try await Clients.agent.connections.listAll(options: nil)
-                connections = result
+                connections = result.sorted { $0.createdAt ?? .now > $1.createdAt ?? .now }
             } catch {
                 NSLog("Error getting connections \(error.localizedDescription)")
                 showAlert = true

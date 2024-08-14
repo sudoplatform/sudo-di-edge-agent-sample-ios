@@ -36,7 +36,7 @@ struct ConnectionExchangeView: View {
 
                                 if connection.state == .invitation && connection.role == .invitee {
                                     Button("Accept") {
-                                        viewModel.accept(connection.connectionExchangeId)
+                                        viewModel.acceptNewConnection(connection.connectionExchangeId)
                                     }
                                     .padding()
                                     .background(.blue)
@@ -129,34 +129,91 @@ struct ConnectionExchangeView: View {
             .padding(.bottom, 50)
         }
         .sheet(item: $viewModel.incomingExchange) { exchange in
-            VStack {
+            let exchangeId = exchange.connectionExchangeId
+            AcceptInvitationAlertView(
+                exchange: exchange,
+                onDecline: { viewModel.decline(exchangeId) },
+                onAcceptReuseConnection: { viewModel.tryReuseConnection(exchangeId, with: $0) },
+                onAcceptNewConnection: { viewModel.acceptNewConnection(exchangeId) }
+            )
+        }
+    }
+}
+
+/// displays the details of an incoming `ConnectionExchange` (i.e. invitation).
+///
+/// Displays the option to reuse (if possible), accept or reject the connection.
+struct AcceptInvitationAlertView: View {
+    let exchange: ConnectionExchange
+    let onDecline: () -> Void
+    let onAcceptReuseConnection: (String) -> Void
+    let onAcceptNewConnection: () -> Void
+    
+    /// ID of a `Connection` which may be reusable for this exchange (if any)
+    @State private var existingConnectionId: String?
+
+    func declineReuse() {
+        existingConnectionId = nil
+    }
+    
+    var body: some View {
+        VStack {
+            Spacer()
+            Text("Incoming Invitation")
+                .font(.largeTitle)
+            if let existingConn = existingConnectionId {
+                Text("Looks like you already have a connection with this peer: '\(existingConn)'")
+                Text("Do you wish to try reuse it?")
                 Spacer()
-                Text("Incoming Invitation")
-                    .font(.largeTitle)
+                HStack {
+                    Button("Reuse") {
+                        onAcceptReuseConnection(existingConn)
+                    }
+                    .padding()
+                    .padding(.leading)
+                    .padding(.trailing)
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                    .clipShape(Capsule())
+                    Button("No") {
+                        declineReuse()
+                    }
+                    .padding()
+                    .padding(.leading)
+                    .padding(.trailing)
+                    .background(.red)
+                    .foregroundStyle(.white)
+                    .clipShape(Capsule())
+                }
+            } else {
                 Text("From: \(exchange.theirLabel ?? "")")
                     .font(.title)
+                Text("Create a new connection?")
                 Spacer()
                 HStack {
                     Button("Accept") {
-                        viewModel.accept(exchange.connectionExchangeId)
+                        onAcceptNewConnection()
                     }
-                        .padding()
-                        .padding(.leading)
-                        .padding(.trailing)
-                        .background(.blue)
-                        .foregroundStyle(.white)
-                        .clipShape(Capsule())
+                    .padding()
+                    .padding(.leading)
+                    .padding(.trailing)
+                    .background(.blue)
+                    .foregroundStyle(.white)
+                    .clipShape(Capsule())
                     Button("Decline") {
-                        viewModel.decline(exchange.connectionExchangeId)
+                        onDecline()
                     }
-                        .padding()
-                        .padding(.leading)
-                        .padding(.trailing)
-                        .background(.red)
-                        .foregroundStyle(.white)
-                        .clipShape(Capsule())
+                    .padding()
+                    .padding(.leading)
+                    .padding(.trailing)
+                    .background(.red)
+                    .foregroundStyle(.white)
+                    .clipShape(Capsule())
                 }
             }
+        }
+        .onAppear {
+            existingConnectionId = exchange.reusableConnectionIds.first
         }
     }
 }

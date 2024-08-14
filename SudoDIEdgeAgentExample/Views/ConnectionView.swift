@@ -20,7 +20,7 @@ struct ConnectionView: View {
                     Spacer()
                 } else {
                     List {
-                        ForEach(viewModel.connections.sorted { $0.createdAt ?? .now > $1.createdAt ?? .now }) { connection in
+                        ForEach(viewModel.connections) { connection in
                             NavigationLink(
                                 destination: {
                                     ConnectionChatView(

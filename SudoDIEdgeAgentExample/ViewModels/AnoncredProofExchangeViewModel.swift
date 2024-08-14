@@ -42,6 +42,9 @@ class AnoncredProofExchangeViewModel: ObservableObject {
 
     /// Suitable credentialIds for the requested predicates (by referent)
     @Published var credentialIdsForPredicates: [String: [String]] = [:]
+    
+    /// Suitable attribute referents which can be self attested
+    @Published var selfAttestableAttributeReferents: [String] = []
 
     /// The presentation data to be selected for meeting the requirements of a attribute or predicate.
     /// Non-nil indicates that there is currently a selection being made for a credential for a given item,
@@ -55,6 +58,23 @@ class AnoncredProofExchangeViewModel: ObservableObject {
     /// Requested predicate referents mapped to the credential ID that has been selected for presenting
     /// that referent.
     @Published var selectedCredentialsForPredicates: [String: String] = [:]
+    
+    /// Requested attribute referents mapped to the self attested value that has been specified for presenting
+    /// the referent.
+    @Published var selfAttestedAttributeReferents: [String: String] = [:]
+    
+    /// Helper function to access a binding for a specific self-attested attribute
+    func selfAttestedAttributeBinding(for key: String) -> Binding<String> {
+        return Binding<String>(
+            get: {
+                self.selfAttestedAttributeReferents[key] ?? ""
+            },
+            set: {
+                self.selfAttestedAttributeReferents[key] = $0
+                self.checkIfPresentationEnabled() // refresh if presentation is allow
+            }
+        )
+    }
 
     init(proof: ProofExchange) {
         self.proof = proof
@@ -68,7 +88,8 @@ class AnoncredProofExchangeViewModel: ObservableObject {
             do {
                 guard case .indy(
                     let credentialsForRequestedAttributes,
-                    let credentialsForRequestedPredicates
+                    let credentialsForRequestedPredicates,
+                    let selfAttestableAttributes
                 ) = try await Clients.agent.proofs.exchange.retrieveCredentialsForProofRequest(
                     proofExchangeId: proof.proofExchangeId
                 ) else {
@@ -76,14 +97,20 @@ class AnoncredProofExchangeViewModel: ObservableObject {
                 }
                 credentialIdsForAttributeGroups = credentialsForRequestedAttributes
                 credentialIdsForPredicates = credentialsForRequestedPredicates
-                for referent in anoncredProofRequest.requestedAttributes.keys {
+                selfAttestableAttributeReferents = selfAttestableAttributes
+                for referent in credentialsForRequestedAttributes.keys {
                     // Set to empty string to keep place in dictionary or if it is set to nil will remove the entry
                     selectedCredentialsForAttributeGroups[referent] = ""
                 }
 
-                for referent in anoncredProofRequest.requestedPredicates.keys {
+                for referent in credentialsForRequestedPredicates.keys {
                     // Set to empty string to keep place in dictionary or if it is set to nil will remove the entry
                     selectedCredentialsForPredicates[referent] = ""
+                }
+                
+                for referent in selfAttestableAttributes {
+                    // Set to empty string to keep place in dictionary or if it is set to nil will remove the entry
+                    selfAttestedAttributeReferents[referent] = ""
                 }
             } catch {
                 NSLog("Error retrieving credentials for proof request \(error.localizedDescription)")
@@ -178,7 +205,8 @@ class AnoncredProofExchangeViewModel: ObservableObject {
                 },
                 credentialsForRequestedPredicates: selectedCredentialsForPredicates.mapValues {
                     AnoncredPresentationPredicate(credentialId: $0)
-                }
+                },
+                selfAttestedAttributes: selfAttestedAttributeReferents
             )
 
             do {
@@ -202,7 +230,8 @@ class AnoncredProofExchangeViewModel: ObservableObject {
     private func checkIfPresentationEnabled() {
         let attributesCompleted = selectedCredentialsForAttributeGroups.filter { $0.value == "" }.isEmpty
         let predicatesCompleted = selectedCredentialsForPredicates.filter { $0.value == "" }.isEmpty
-        presentEnabled = attributesCompleted && predicatesCompleted
+        let selfAttestedCompleted = selfAttestedAttributeReferents.filter { $0.value == "" }.isEmpty
+        presentEnabled = attributesCompleted && predicatesCompleted && selfAttestedCompleted
     }
 }
 

@@ -19,7 +19,7 @@ struct CredentialListView: View {
                     Spacer()
                 } else {
                     List {
-                        ForEach(viewModel.credentials.sorted { $0.createdAt ?? .now > $1.createdAt ?? .now }) { credential in
+                        ForEach(viewModel.credentials) { credential in
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text(credential.credentialId)

@@ -35,7 +35,7 @@ class CredentialListViewModel: ObservableObject {
             isLoading = true
             do {
                 let result = try await Clients.agent.credentials.listAll(options: nil)
-                credentials = result
+                credentials = result.sorted { $0.createdAt ?? .now > $1.createdAt ?? .now }
             } catch {
                 NSLog("Error getting credentials \(error.localizedDescription)")
                 showAlert = true

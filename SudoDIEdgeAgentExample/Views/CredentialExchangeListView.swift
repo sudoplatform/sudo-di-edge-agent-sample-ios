@@ -23,7 +23,7 @@ struct CredentialExchangeListView: View {
                     Spacer()
                 } else {
                     List {
-                        ForEach(viewModel.exchanges.sorted { $0.createdAt ?? .now > $1.createdAt ?? .now }) { exchange in
+                        ForEach(viewModel.exchanges) { exchange in
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text(exchange.credentialExchangeId)

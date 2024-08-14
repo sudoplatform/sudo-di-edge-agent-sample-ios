@@ -46,7 +46,8 @@ public class SudoDIRelayMessageSource: MessageSource {
             return nil
         }
         let metadata = ReceivedMessageMetadata(
-            receivedTime: relayMessage.createdAt
+            receivedTime: relayMessage.createdAt,
+            sourceType: .relay
         )
         return Message(
             id: relayMessage.id,

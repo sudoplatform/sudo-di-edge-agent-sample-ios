@@ -51,7 +51,7 @@ class CredentialExchangeListViewModel: ObservableObject {
             isLoading = true
             do {
                 let result = try await Clients.agent.credentials.exchange.listAll(options: nil)
-                exchanges = result
+                exchanges = result.sorted { $0.startedAt ?? .now > $1.startedAt ?? .now }
             } catch {
                 NSLog("Error getting credential exchanges \(error.localizedDescription)")
                 showAlert = true
@@ -184,12 +184,12 @@ extension CredentialExchange: Identifiable {
     public var id: String { self.credentialExchangeId }
 }
 
-/// Convenience to get the `created_timestamp`
+/// Convenience to get the `started_timestamp`
 extension CredentialExchange {
-    /// The date value retrieved from the `~created_timestamp` in the tags property
-    var createdAt: Date? {
+    /// The date value retrieved from the `~started_timestamp` in the tags property
+    var startedAt: Date? {
         return self.tags
-            .first { $0.name == "~created_timestamp" }
+            .first { $0.name == "~started_timestamp" }
             .flatMap { Double($0.value) }
             .flatMap { Date(timeIntervalSince1970: $0) }
     }
