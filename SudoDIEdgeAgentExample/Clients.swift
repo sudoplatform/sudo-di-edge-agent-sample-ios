@@ -29,6 +29,7 @@ class Clients {
     static private(set) var relaySource: SudoDIRelayMessageSource!
     static private(set) var mutliMessageSource: RoundRobinMultiMessageSource!
 
+    static var pendingDeepLinks: [URL] = []
 
     /// NOTE: These are demo purposes only
     private static let walletId: String = "wallet"
@@ -38,7 +39,6 @@ class Clients {
 
     /// NOTE: These are demo purposes only
     static let walletConfig: WalletConfiguration = .init(id: walletId, passphrase: passphrase)
-
 
     static func configure() throws {
         self.userClient = try DefaultSudoUserClient(keyNamespace: "diExample")
@@ -54,7 +54,7 @@ class Clients {
         self.relayManager = RelayManager(relayClient: self.relayClient, sudoManager: self.sudoManager)
 
 
-        let driver: LogDriverProtocol = NSLogDriver(level: .none)
+        let driver: LogDriverProtocol = NSLogDriver(level: .debug)
         self.logger = Logger(identifier: "di-edge-example", driver: driver)
 
         guard let genesisFile = Bundle.main.url(forResource: "genesis_ledger.json", withExtension: nil) else {
@@ -74,6 +74,7 @@ class Clients {
         )
         self.agent = try SudoDIEdgeAgentBuilder()
             .setAgentConfiguration(agentConfiguration: self.agentConfiguration)
+            .setLogger(logger: logger)
             .build()
     }
 

@@ -63,24 +63,38 @@ struct ProofExchangeListView: View {
 struct PresentButtonView: View {
     @Binding var isLoading: Bool
     var proof: ProofExchange
+    
 
     var body: some View {
-        if proof.state == .request {
+        if proof.state == .aries(.request) || proof.state == .openId4Vc(.request) {
             NavigationLink("Present") {
-                switch proof.formatData {
-                case .indy:
-                    AnoncredProofExchangeView(viewModel: .init(proof: proof))
-                case .dif:
-                    DifProofExchangeView(viewModel: .init(proof: proof))
+                switch proof {
+                case .aries(let aries):
+                    switch aries.formatData {
+                    case .indy(let proofRequest):
+                        AnoncredProofExchangeView(viewModel: .init(
+                            proof: proof,
+                            proofRequest: proofRequest
+                        ))
+                    case .dif(let dif):
+                        DifProofExchangeView(viewModel: .init(
+                            proof: proof,
+                            proofRequest: dif
+                        ))
+                    }
+                case .openId4Vc(let oid4vc):
+                    DifProofExchangeView(viewModel: .init(
+                        proof: proof,
+                        proofRequest: oid4vc.presentationRequest
+                    ))
                 }
-            }
-            .frame(maxWidth: 85)
-            .padding()
-            .background(.blue)
-            .foregroundStyle(.white)
-            .clipShape(Capsule())
-            .buttonStyle(.borderless)
-            .disabled(isLoading)
+            }.frame(maxWidth: 85)
+                .padding()
+                .background(.blue)
+                .foregroundStyle(.white)
+                .clipShape(Capsule())
+                .buttonStyle(.borderless)
+                .disabled(isLoading)
         }
     }
 }

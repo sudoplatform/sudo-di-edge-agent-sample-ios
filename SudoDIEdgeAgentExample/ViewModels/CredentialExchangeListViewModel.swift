@@ -61,45 +61,6 @@ class CredentialExchangeListViewModel: ObservableObject {
         }
     }
 
-    /// Accepts a given `CredentialExchange` offer
-    func accept() {
-        Task { @MainActor in
-            isLoading = true
-            do {
-                let holderDid = try await idempotentCreateHolderDidKey(agent: Clients.agent)
-
-                // An offer requires a configuration to adjust how to store the credential
-                // which in this cause is left to the defaults.
-                let configuration = AcceptCredentialOfferConfiguration(
-                    autoStoreCredential: true,
-                    formatSpecificConfiguration: .ariesLdProofVc(
-                        overrideCredentialSubjectId: holderDid
-                    )
-                )
-
-                guard let credential = presentedExchange else {
-                    NSLog("Missing credential")
-                    // This case really won't happen, but if by some unknown power it does,
-                    // this will set credential to nil and the sheet will disappear
-                    presentedExchange = nil
-                    return
-                }
-                // This is going to ignore the result as the subscriber will
-                // monitor and update changes to the credential
-                _ = try await Clients.agent.credentials.exchange.acceptOffer(
-                    credentialExchangeId: credential.credentialExchangeId,
-                    configuration: configuration
-                )
-            } catch {
-                NSLog("Error accepting credential exchange \(error.localizedDescription)")
-                showAlert = true
-                alertMessage = error.localizedDescription
-            }
-            presentedExchange = nil
-            isLoading = false
-        }
-    }
-
     /// Method for swiping to delete a credential exchange
     func delete(at offsets: IndexSet) {
         let idsToDelete = offsets.map { exchanges[$0].credentialExchangeId }
@@ -130,17 +91,27 @@ class CredentialExchangeListViewModel: ObservableObject {
     /// Helper function to return the string representation of the state
     func getState(_ state: CredentialExchangeState) -> String {
         switch state {
-        case .proposal:
+        case .aries(.proposal):
             return "Proposal"
-        case .offer:
+        case .aries(.offer):
             return "Offer"
-        case .request:
+        case .aries(.request):
             return "Request"
-        case .issued:
+        case .aries(.issued):
             return "Issued"
-        case .acked:
+        case .openId4Vc(.issued):
+            return "Issued"
+        case .aries(.acked):
             return "Acked"
-        case .abandoned:
+        case .aries(.abandoned):
+            return "Abandoned"
+        case .openId4Vc(.unauthorized):
+            return "Unauthorized"
+        case .openId4Vc(.authorized):
+            return "Authorized"
+        case .openId4Vc(.done):
+            return "Done"
+        case .openId4Vc(.abandoned):
             return "Abandoned"
         }
     }
@@ -195,27 +166,31 @@ extension CredentialExchange {
     }
 }
 
-/// Creates an Ed25519 DID:KEY if one does not already exist.
-///
-/// Returns the new or existing did:key DID
-private func idempotentCreateHolderDidKey(agent: SudoDIEdgeAgent) async throws -> String {
-    let dids = try await agent.dids.listAll(
-        options: ListDidsOptions(filters: ListDidsFilters(method: .didKey))
-    )
-    let existingDid = dids.first
-    
-    if let did = existingDid?.did {
-        return did
+extension CredentialExchange {
+    var previewExchangeType: String {
+        switch self {
+        case .aries: "Aries"
+        case .openId4Vc: "OID4VC"
+        }
     }
     
-    let newDid = try await agent.dids.createDid(
-        options: .didKey(keyType: .ed25519)
-    )
-    return newDid.did
+    var previewCredName: String? {
+        switch self {
+        case .aries(let aries): aries.formatData.previewCredName
+        case .openId4Vc: nil
+        }
+    }
+    
+    var previewCredFormat: String? {
+        switch self {
+        case .aries(let aries): aries.formatData.previewCredFormat
+        case .openId4Vc: nil
+        }
+    }
 }
 
-extension CredentialExchangeFormatData {
-    var previewName: String {
+extension AriesCredentialExchangeFormatData {
+    var previewCredName: String {
         switch self {
         case .ariesLdProof(let w3cCred, _):
             return w3cCred.types.first { $0 != "VerifiableCredential" } ?? "VerifiableCredential"
@@ -224,7 +199,7 @@ extension CredentialExchangeFormatData {
         }
     }
     
-    var formatPreviewName: String {
+    var previewCredFormat: String {
         switch self {
             
         case .indy:

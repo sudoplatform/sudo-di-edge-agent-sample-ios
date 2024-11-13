@@ -76,15 +76,15 @@ class ProofExchangeListViewModel: ObservableObject {
 
     func getState(_ state: ProofExchangeState) -> String {
         switch state {
-        case .proposal:
+        case .aries(.proposal):
             return "Proposal"
-        case .request:
+        case .aries(.request), .openId4Vc(.request):
             return "Request"
-        case .presented:
+        case .aries(.presented), .openId4Vc(.presented):
             return "Presented"
-        case .acked:
+        case .aries(.acked):
             return "Acked"
-        case .abandoned:
+        case .aries(.abandoned), .openId4Vc(.abandoned):
             return "Abadoned"
         }
     }

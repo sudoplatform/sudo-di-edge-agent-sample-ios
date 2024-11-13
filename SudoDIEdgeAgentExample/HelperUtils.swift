@@ -43,3 +43,7 @@ extension Sequence {
         return values
     }
 }
+
+extension String: LocalizedError {
+    public var errorDescription: String? { return self }
+}

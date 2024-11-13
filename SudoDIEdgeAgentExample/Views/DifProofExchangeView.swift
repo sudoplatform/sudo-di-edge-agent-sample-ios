@@ -18,7 +18,16 @@ struct DifProofExchangeView: View {
             Spacer()
             VStack {
                 BoldedLineItem(name: "ID", value: viewModel.proof.proofExchangeId)
-                BoldedLineItem(name: "From Connection", value: viewModel.proof.connectionId)
+                switch viewModel.proof {
+                case .aries(let aries): BoldedLineItem(
+                    name: "From Connection",
+                    value: aries.connectionId
+                )
+                case .openId4Vc(let oid4vc): BoldedLineItem(
+                    name: "From Verifier",
+                    value: oid4vc.verifierId
+                )
+                }
                 Divider()
                 List {
                     Section {

@@ -20,7 +20,16 @@ struct AnoncredProofExchangeView: View {
             Spacer()
             VStack {
                 BoldedLineItem(name: "ID", value: viewModel.proof.proofExchangeId)
-                BoldedLineItem(name: "From Connection", value: viewModel.proof.connectionId)
+                switch viewModel.proof {
+                case .aries(let aries): BoldedLineItem(
+                    name: "From Connection",
+                    value: aries.connectionId
+                )
+                case .openId4Vc(let oid4vc): BoldedLineItem(
+                    name: "From Verifier",
+                    value: oid4vc.verifierId
+                )
+                }
                 Divider()
                 List {
                     if !viewModel.credentialIdsForAttributeGroups.isEmpty {
@@ -129,21 +138,29 @@ struct AnoncredProofExchangeView: View {
 struct ProofExchangeView_Previews: PreviewProvider {
     static var previews: some View {
         AnoncredProofExchangeView(viewModel: .init(
-            proof: .init(
+            proof: .aries(.init(
                 proofExchangeId: "proofExchangeId",
+                tags: [
+                    .init(name: "~created_timestamp", value: "1698891059")
+                ],
+                errorMessage: nil,
+                state: .presented,
                 connectionId: "connectionId",
                 initiator: .internal,
-                state: .presented,
                 formatData: .indy(proofRequest: AnoncredProofRequestInfo(
                     name: "Proof Req",
                     version: "1.0",
                     requestedAttributes: [:],
                     requestedPredicates: [:],
                     nonRevoked: nil
-                )),
-                errorMessage: nil, tags: [
-                    .init(name: "~created_timestamp", value: "1698891059")
-                ]
+                ))
+            )),
+            proofRequest: .init(
+                name: "Proof Req",
+                version: "1.0",
+                requestedAttributes: [:],
+                requestedPredicates: [:],
+                nonRevoked: nil
             )
         ))
     }

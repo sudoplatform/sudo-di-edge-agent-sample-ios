@@ -96,6 +96,8 @@ extension CredentialFormatData {
             return w3cCred.types.first { $0 != "VerifiableCredential" } ?? "VerifiableCredential"
         case .anoncredV1(let metadata, _):
             return metadata.credentialDefinitionInfo?.name ?? metadata.credentialDefinitionId
+        case .sdJwtVc(let cred):
+            return cred.verifiableCredentialType
         }
     }
     
@@ -105,6 +107,8 @@ extension CredentialFormatData {
             return "Anoncred"
         case .w3c:
             return "W3C"
+        case .sdJwtVc:
+            return "SD-JWT VC"
         }
     }
 }

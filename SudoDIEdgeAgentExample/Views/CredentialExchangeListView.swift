@@ -27,8 +27,13 @@ struct CredentialExchangeListView: View {
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text(exchange.credentialExchangeId)
-                                    Text(exchange.formatData.previewName)
-                                    Text(exchange.formatData.formatPreviewName)
+                                    Text(exchange.previewExchangeType)
+                                    if let name = exchange.previewCredName {
+                                        Text(name)
+                                    }
+                                    if let fmt = exchange.previewCredFormat {
+                                        Text(fmt)
+                                    }
                                     Text(viewModel.getState(exchange.state))
                                 }
                                 Spacer()
@@ -66,25 +71,15 @@ struct CredentialExchangeListView: View {
             .navigationTitle("Credential Exchange")
             .task { viewModel.subscribe() }
             .onDisappear(perform: viewModel.unsubscribe)
-            .sheet(item: $viewModel.presentedExchange, onDismiss: viewModel.dismissInfo) { exchange in
+            .sheet(
+                item: $viewModel.presentedExchange,
+                onDismiss: viewModel.dismissInfo
+            ) { exchange in
                 VStack {
-                    CredentialExchangeView(viewModel: .init(credential: exchange))
-                    if exchange.state == .offer {
-                        Button(action: viewModel.accept) {
-                            if viewModel.isLoading {
-                                ProgressView()
-                            } else {
-                                Text("Accept")
-                            }
-                        }
-                        .padding()
-                        .frame(width: 200)
-                        .background(.blue)
-                        .foregroundStyle(.white)
-                        .clipShape(Capsule())
-                        .disabled(viewModel.isLoading)
-                        .frame(maxWidth: .infinity)
-                    }
+                    CredentialExchangeView(
+                        viewModel: .init(exchange: exchange),
+                        onDismissRequest: viewModel.dismissInfo
+                    )
                 }
             }
             .alert("Error", isPresented: $viewModel.showAlert) {

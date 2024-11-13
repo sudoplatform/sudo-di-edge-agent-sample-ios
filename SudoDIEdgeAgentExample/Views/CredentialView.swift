@@ -17,16 +17,22 @@ struct CredentialView: View {
             case .anoncredV1(let credentialMetadata, let credentialAttributes):
                 AnoncredCredentialInfoColumn(
                     id: credential.credentialId,
-                    fromConnection: credential.connectionId,
+                    fromSource: credential.credentialSource,
                     metadata: credentialMetadata,
                     attributes: credentialAttributes
                 )
             case .w3c(let w3cCred):
                 W3cCredentialInfoColumn(
                     id: credential.credentialId,
-                    fromConnection: credential.connectionId,
+                    fromSource: credential.credentialSource,
                     w3cCredential: w3cCred,
                     proofType: w3cCred.proof?.first?.proofType
+                )
+            case .sdJwtVc(let sdJwtVc):
+                SdJwtCredentialInfoColumn(
+                    id: credential.credentialId,
+                    fromSource: credential.credentialSource,
+                    sdJwtVc: sdJwtVc
                 )
             }
         }
@@ -39,7 +45,7 @@ struct CredentialView_Previews: PreviewProvider {
             credential: .init(
                 credentialId: "credentialId", 
                 credentialExchangeId: "credentialExchangeId",
-                connectionId: "connectionId",
+                credentialSource: .didCommConnection(connectionId: "connectionId"),
                 formatData: .anoncredV1(
                     credentialMetadata: .init(
                         credentialDefinitionId: "credentialDefinitionId",

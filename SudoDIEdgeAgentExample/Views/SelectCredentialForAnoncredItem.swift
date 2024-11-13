@@ -64,7 +64,7 @@ extension Credential {
         switch formatData {
         case let .anoncredV1(_, attrs):
             return attrs
-        case .w3c:
+        default:
             fatalError("Wrong format")
         }
     }
@@ -83,7 +83,7 @@ struct CredentialForItemView_Previews: PreviewProvider {
                     .init(
                         credentialId: "credentialId",
                         credentialExchangeId: "credentialExchangeId",
-                        connectionId: "connectionId",
+                        credentialSource: .didCommConnection(connectionId: "connectionId"),
                         formatData: .anoncredV1(
                             credentialMetadata: .init(
                                 credentialDefinitionId: "credentialDefinitionId",
@@ -103,7 +103,7 @@ struct CredentialForItemView_Previews: PreviewProvider {
                     .init(
                         credentialId: "credentialId2",
                         credentialExchangeId: "credentialExchangeId2",
-                        connectionId: "connectionId",
+                        credentialSource: .didCommConnection(connectionId: "connectionId"),
                         formatData: .anoncredV1(
                             credentialMetadata: .init(
                                 credentialDefinitionId: "credentialDefinitionId",

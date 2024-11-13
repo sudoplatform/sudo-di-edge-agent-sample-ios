@@ -30,12 +30,8 @@ class AnoncredProofExchangeViewModel: ObservableObject {
     /// The `ProofExchange` in which the verifier is requesting
     @Published var proof: ProofExchange
     
-    var anoncredProofRequest: AnoncredProofRequestInfo {
-        guard case .indy(let req) = proof.formatData else {
-            fatalError("Unknown format")
-        }
-        return req
-    }
+    /// The `AnoncredProofRequestInfo` of the `ProofExchange` for which this view model is presenting for
+    @Published var anoncredProofRequest: AnoncredProofRequestInfo
 
     /// Suitable credentialIds for the requested attribute groups (by referent)
     @Published var credentialIdsForAttributeGroups: [String: [String]] = [:]
@@ -76,8 +72,9 @@ class AnoncredProofExchangeViewModel: ObservableObject {
         )
     }
 
-    init(proof: ProofExchange) {
+    init(proof: ProofExchange, proofRequest: AnoncredProofRequestInfo) {
         self.proof = proof
+        self.anoncredProofRequest = proofRequest
     }
 
     /// Retrieves all requested attributes and predicates for a proof and sets up respective dictionaries.

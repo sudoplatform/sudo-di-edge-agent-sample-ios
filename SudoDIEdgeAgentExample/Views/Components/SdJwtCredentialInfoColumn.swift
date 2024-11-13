@@ -1,18 +1,17 @@
 //
-// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2024 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 
 import Foundation
 import SwiftUI
 import SudoDIEdgeAgent
 
-struct AnoncredCredentialInfoColumn: View {
+struct SdJwtCredentialInfoColumn: View {
     var id: String
     var fromSource: CredentialSource
-    var metadata: AnoncredV1CredentialMetadata
-    var attributes: [AnoncredV1CredentialAttribute]
+    var sdJwtVc: SdJwtVerifiableCredential
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -23,20 +22,22 @@ struct AnoncredCredentialInfoColumn: View {
             case .openId4VcIssuer(let issuerUrl):
                 BoldedLineItem(name: "From OID Issuer", value: issuerUrl)
             }
-            BoldedLineItem(name: "Format", value: "Anoncreds")
-            BoldedLineItem(name: "Cred Def ID", value: metadata.credentialDefinitionId)
-            BoldedLineItem(name: "Cred Def Name", value: metadata.credentialDefinitionInfo?.name ?? "Unknown")
-            BoldedLineItem(name: "Schema ID", value: metadata.schemaId)
+            BoldedLineItem(name: "Format", value: "SD-JWT")
+            BoldedLineItem(name: "Issuer", value: sdJwtVc.issuer)
+            if let iat = sdJwtVc.issuedAt {
+                BoldedLineItem(name: "Issuance Date", value: "\(iat)")
+            }
+            BoldedLineItem(name: "Type", value: sdJwtVc.verifiableCredentialType)
 
             Divider()
 
-            Text("Attributes")
+            Text("Claims")
                 .font(.title2)
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.bottom)
 
-            ForEach(attributes, id: \.self) { attribute in
-                BoldedLineItem(name: attribute.name, value: attribute.value)
+            ForEach(Array(sdJwtVc.claims), id: \.key) { key, value in
+                BoldedLineItem(name: key, value: "\(value)")
             }
             Spacer()
         }

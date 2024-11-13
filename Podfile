@@ -7,7 +7,7 @@ use_modular_headers!
 inhibit_all_warnings!
 
 target 'SudoDIEdgeAgentExample' do
-  pod 'SudoDIEdgeAgent', '3.0.0'
+  pod 'SudoDIEdgeAgent', '4.0.0'
   pod 'SudoProfiles', '~> 17.0'
   pod 'SudoEntitlements', '~> 9.0'
 end

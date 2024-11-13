@@ -27,22 +27,23 @@ class DifProofExchangeViewModel: ObservableObject {
     /// The `ProofExchange` in which the verifier is requesting
     @Published var proof: ProofExchange
     
-    var difProofRequest: PresentationDefinition {
-        guard case .dif(let req) = proof.formatData else {
-            fatalError("Unknown format")
-        }
-        return req
-    }
+    @Published var difProofRequest: PresentationDefinitionV2
 
     /// Suitable credentialIds for the requested input descriptors
     @Published var credentialsForRequestedDescriptors: [String: [Credential]] = [:]
 
-    @Published var selectingCredentialForDescriptor: InputDescriptor?
+    @Published var selectingCredentialForDescriptor: InputDescriptorV2?
     
     @Published var selectedCredentialIdsForDescriptors: [String: String] = [:]
 
-    init(proof: ProofExchange) {
+    init(proof: ProofExchange, proofRequest: PresentationDefinitionV1) {
         self.proof = proof
+        self.difProofRequest = proofRequest.toV2()
+    }
+    
+    init(proof: ProofExchange, proofRequest: PresentationDefinitionV2) {
+        self.proof = proof
+        self.difProofRequest = proofRequest
     }
 
     /// Retrieves all the suitable credentialIds for each requested DIF input descriptor, then map input descriptor IDs
@@ -130,7 +131,7 @@ class DifProofExchangeViewModel: ObservableObject {
     }
 }
 
-extension InputDescriptor: Identifiable {
+extension InputDescriptorV2: Identifiable {
 }
 
 extension StringOrNumber {
@@ -141,5 +142,36 @@ extension StringOrNumber {
         case .number(let x):
             "\(x)"
         }
+    }
+}
+
+extension PresentationDefinitionV1 {
+    func toV2() -> PresentationDefinitionV2 {
+        .init(
+            id: id ?? "N/A",
+            inputDescriptors: inputDescriptors.map { $0.toV2() },
+            name: name,
+            purpose: purpose,
+            submissionRequirements: submissionRequirements
+        )
+    }
+}
+
+extension InputDescriptorV1 {
+    func toV2() -> InputDescriptorV2 {
+        .init(
+            id: id,
+            name: name,
+            purpose: purpose,
+            constraints: constraints ?? .init(
+                limitDisclosure: nil,
+                statuses: nil,
+                subjectIsIssuer: nil,
+                isHolder: [],
+                sameSubject: [],
+                fields: []
+            ),
+            group: group
+        )
     }
 }

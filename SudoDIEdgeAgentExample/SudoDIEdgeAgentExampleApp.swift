@@ -20,7 +20,13 @@ struct SudoDIEdgeAgentExampleApp: App {
     
     var body: some Scene {
         WindowGroup {
-            RegisterView(viewModel: RegisterViewModel())
+            RegisterView(viewModel: RegisterViewModel()).onOpenURL { url in
+                Task { @MainActor in
+                    // simply try any URL as a URL for the agent to receive.
+                    // ideally URLs should be pre-filtered and understood by the application.
+                    try await Clients.agent.receiveUrl(url: url.absoluteString)
+                }
+            }
         }
     }
 }

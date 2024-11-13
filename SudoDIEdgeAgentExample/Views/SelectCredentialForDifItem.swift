@@ -11,7 +11,7 @@ import SwiftUI
 /// Since this is simply returning a credential id and not interacting with the agent, there is no accompanying view model with this view.
 struct SelectCredentialForDifItemView: View {
     /// The presentation credential information
-    var inputDescriptor: InputDescriptor
+    var inputDescriptor: InputDescriptorV2
     var suitableCredentials: [Credential]
 
     /// Returns the selected identifier and credential id
@@ -28,7 +28,7 @@ struct SelectCredentialForDifItemView: View {
                 BoldedLineItem(name: "Name", value: inputDescriptor.name ?? "None")
                 BoldedLineItem(name: "Purpose", value: inputDescriptor.purpose ?? "None")
 
-                let fields = inputDescriptor.constraints?.fields ?? []
+                let fields = inputDescriptor.constraints.fields
                 ForEach(Array(zip(fields.indices, fields)), id: \.0) { index, field in
                     Spacer()
                     BoldedLineItem(name: "Constraint #\(index)", value: "")
@@ -67,6 +67,12 @@ struct SelectCredentialForDifItemView: View {
                     if let notValue = field.filter?.not {
                         BoldedLineItem(name: "required not filter", value: "\(notValue)")
                     }
+                    if let otherValue = field.filter?.other {
+                        BoldedLineItem(
+                            name: "other JSONSchema filter",
+                            value: "\(otherValue)"
+                        )
+                    }
                 }
 
                 Text("Select a Credential:")
@@ -77,7 +83,10 @@ struct SelectCredentialForDifItemView: View {
                     Text("No suitable credentials found")
                 }
                 ForEach(suitableCredentials, id: \.credentialId) { cred in
-                    SelectableCredentialCard(cred: cred, onSelectCredential: onSelectCredential)
+                    SelectableCredentialCard(
+                        cred: cred,
+                        onSelectCredential: onSelectCredential
+                    )
                 }
             }
             .padding()
@@ -90,31 +99,33 @@ private struct SelectableCredentialCard: View {
     let onSelectCredential: (_ credId: String) -> Void
 
     var body: some View {
-        let w3c = cred.forceGetW3cDetail()
         ZStack {
             RoundedRectangle(cornerRadius: 10.0)
                 .fill(Color(UIColor.secondarySystemBackground))
                 .shadow(radius: 5)
 
             VStack(alignment: .leading) {
-                BoldedLineItem(name: "ID", value: cred.credentialId)
-                BoldedLineItem(name: "Issuer", value: w3c.issuer.id)
-                BoldedLineItem(name: "Date", value: w3c.issuanceDate)
-                let type = w3c.types.first { $0 != "VerifiableCredential" } ?? "VerifiableCredential"
-                BoldedLineItem(name: "Type", value: type)
-
-                ForEach(
-                    Array(zip(w3c.credentialSubject.indices, w3c.credentialSubject)),
-                    id: \.0
-                ) { index, sub in
-                    Spacer()
-                    BoldedLineItem(name: "Subject #\(index)", value: "")
-                    BoldedLineItem(name: "ID", value: sub.id ?? "None")
-                    ForEach(Array(sub.properties), id: \.key) { k, v in
-                        BoldedLineItem(name: k, value: "\(v)")
-                    }
+                switch cred.formatData {
+                case .anoncredV1(let credentialMetadata, let credentialAttributes):
+                    AnoncredCredentialInfoColumn(
+                        id: cred.credentialId,
+                        fromSource: cred.credentialSource,
+                        metadata: credentialMetadata,
+                        attributes: credentialAttributes
+                    )
+                case .w3c(let w3c):
+                    W3cCredentialInfoColumn(
+                        id: cred.credentialId,
+                        fromSource: cred.credentialSource,
+                        w3cCredential: w3c
+                    )
+                case .sdJwtVc(let sdJwtVc):
+                    SdJwtCredentialInfoColumn(
+                        id: cred.credentialId,
+                        fromSource: cred.credentialSource,
+                        sdJwtVc: sdJwtVc
+                    )
                 }
-
                 Button("Select") {
                     onSelectCredential(cred.credentialId)
                 }
@@ -131,22 +142,11 @@ private struct SelectableCredentialCard: View {
     }
 }
 
-extension Credential {
-    func forceGetW3cDetail() -> W3cCredential {
-        switch formatData {
-        case let .w3c(cred):
-            return cred
-        case .anoncredV1:
-            fatalError("Wrong format")
-        }
-    }
-}
-
 struct CredentialForDifItemView_Previews: PreviewProvider {
-    static let cred = Credential(
+    static let w3cCred = Credential(
         credentialId: "1",
         credentialExchangeId: "1",
-        connectionId: "conn1",
+        credentialSource: .didCommConnection(connectionId: "conn1"),
         formatData: .w3c(
             credential: .init(
                 contexts: [],
@@ -176,14 +176,33 @@ struct CredentialForDifItemView_Previews: PreviewProvider {
             )
         ),
         tags: []
+    )    
+    static let sdJwtVc = Credential(
+        credentialId: "2",
+        credentialExchangeId: "1",
+        credentialSource: .openId4VcIssuer(issuerUrl: "issuer:foo"),
+        formatData: .sdJwtVc(
+            credential: .init(
+                compactSdJwt: "foo.bar.xyz",
+                verifiableCredentialType: "ResidencyCard",
+                issuer: "did:foo:bar",
+                validAfter: nil,
+                validBefore: nil,
+                issuedAt: 1731369621,
+                keyBinding: nil,
+                claims: [
+                    "given_name": .string(canSelectiveDisclose: true, data: "Hello"),
+                    "family_name": .string(canSelectiveDisclose: true, data: "World")
+                ]
+            )
+        ),
+        tags: []
     )
 
     static var previews: some View {
         SelectCredentialForDifItemView(
             inputDescriptor: .init(
                 id: "1",
-                schema: .schemas(schemas: []),
-                group: [],
                 name: "Proof of Residency",
                 purpose: nil,
                 constraints: .init(
@@ -197,6 +216,7 @@ struct CredentialForDifItemView_Previews: PreviewProvider {
                             path: ["$.credentialSubject.givenName"],
                             id: nil,
                             purpose: "Given name is Bob",
+                            name: nil,
                             filter: .init(
                                 fieldType: nil,
                                 format: nil,
@@ -208,14 +228,17 @@ struct CredentialForDifItemView_Previews: PreviewProvider {
                                 minLength: nil,
                                 maxLength: nil,
                                 const: .stringValue("Bob"),
-                                enum: nil
+                                enum: nil,
+                                other: .init()
                             ),
+                            optional: nil,
                             predicate: nil
                         )
                     ]
-                )
+                ),
+                group: []
             ),
-            suitableCredentials: [cred, cred],
+            suitableCredentials: [w3cCred, sdJwtVc, w3cCred],
             onSelectCredential: { print("Selected", $0) }
         )
     }
