@@ -21,10 +21,10 @@ class CredentialExchangeListViewModel: ObservableObject {
     @Published var alertMessage: String = ""
 
     /// The list of credential exchanges from the agent
-    @Published var exchanges: [CredentialExchange] = []
+    @Published var exchanges: [UICredentialExchange] = []
 
     /// The `CredentialExchange` that is presented in the sheet
-    @Published var presentedExchange: CredentialExchange?
+    @Published var presentedExchange: UICredentialExchange?
 
     /// subscriberId is used to be able to unsubscribe from agent events after navigating away from the view
     private var subscriberId: String?
@@ -51,7 +51,14 @@ class CredentialExchangeListViewModel: ObservableObject {
             isLoading = true
             do {
                 let result = try await Clients.agent.credentials.exchange.listAll(options: nil)
-                exchanges = result.sorted { $0.startedAt ?? .now > $1.startedAt ?? .now }
+                exchanges = try await result
+                    .sorted { $0.startedAt ?? .now > $1.startedAt ?? .now }
+                    .asyncCompactMap {
+                        try await UICredentialExchange.fromCredentialExchange(
+                            agent: Clients.agent,
+                            exchange: $0
+                        )
+                    }
             } catch {
                 NSLog("Error getting credential exchanges \(error.localizedDescription)")
                 showAlert = true
@@ -63,7 +70,7 @@ class CredentialExchangeListViewModel: ObservableObject {
 
     /// Method for swiping to delete a credential exchange
     func delete(at offsets: IndexSet) {
-        let idsToDelete = offsets.map { exchanges[$0].credentialExchangeId }
+        let idsToDelete = offsets.map { exchanges[$0].exchange.credentialExchangeId }
         _ = idsToDelete.compactMap({ id in
             Task { @MainActor [weak self] in
                 do {
@@ -79,7 +86,7 @@ class CredentialExchangeListViewModel: ObservableObject {
     }
 
     /// Shows the info of a given credential exchange in a sheet
-    func showInfo(_ credential: CredentialExchange) {
+    func showInfo(_ credential: UICredentialExchange) {
         presentedExchange = credential
     }
 
@@ -163,49 +170,5 @@ extension CredentialExchange {
             .first { $0.name == "~started_timestamp" }
             .flatMap { Double($0.value) }
             .flatMap { Date(timeIntervalSince1970: $0) }
-    }
-}
-
-extension CredentialExchange {
-    var previewExchangeType: String {
-        switch self {
-        case .aries: "Aries"
-        case .openId4Vc: "OID4VC"
-        }
-    }
-    
-    var previewCredName: String? {
-        switch self {
-        case .aries(let aries): aries.formatData.previewCredName
-        case .openId4Vc: nil
-        }
-    }
-    
-    var previewCredFormat: String? {
-        switch self {
-        case .aries(let aries): aries.formatData.previewCredFormat
-        case .openId4Vc: nil
-        }
-    }
-}
-
-extension AriesCredentialExchangeFormatData {
-    var previewCredName: String {
-        switch self {
-        case .ariesLdProof(let w3cCred, _):
-            return w3cCred.types.first { $0 != "VerifiableCredential" } ?? "VerifiableCredential"
-        case .indy(let metadata, _):
-            return metadata.credentialDefinitionInfo?.name ?? metadata.credentialDefinitionId
-        }
-    }
-    
-    var previewCredFormat: String {
-        switch self {
-            
-        case .indy:
-            return "Anoncred"
-        case .ariesLdProof:
-            return "W3C"
-        }
     }
 }

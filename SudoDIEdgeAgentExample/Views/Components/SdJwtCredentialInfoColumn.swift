@@ -9,25 +9,23 @@ import SwiftUI
 import SudoDIEdgeAgent
 
 struct SdJwtCredentialInfoColumn: View {
-    var id: String
-    var fromSource: CredentialSource
-    var sdJwtVc: SdJwtVerifiableCredential
+    var credential: UICredential.SdJwtVc
 
     var body: some View {
         VStack(alignment: .leading) {
-            BoldedLineItem(name: "ID", value: id)
-            switch fromSource {
+            BoldedLineItem(name: "ID", value: credential.id)
+            switch credential.source {
             case .didCommConnection(let connectionId):
                 BoldedLineItem(name: "From Connection", value: connectionId)
             case .openId4VcIssuer(let issuerUrl):
                 BoldedLineItem(name: "From OID Issuer", value: issuerUrl)
             }
             BoldedLineItem(name: "Format", value: "SD-JWT")
-            BoldedLineItem(name: "Issuer", value: sdJwtVc.issuer)
-            if let iat = sdJwtVc.issuedAt {
+            BoldedLineItem(name: "Issuer", value: credential.sdJwtVc.issuer)
+            if let iat = credential.sdJwtVc.issuedAt {
                 BoldedLineItem(name: "Issuance Date", value: "\(iat)")
             }
-            BoldedLineItem(name: "Type", value: sdJwtVc.verifiableCredentialType)
+            BoldedLineItem(name: "Type", value: credential.sdJwtVc.verifiableCredentialType)
 
             Divider()
 
@@ -36,7 +34,7 @@ struct SdJwtCredentialInfoColumn: View {
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.bottom)
 
-            ForEach(Array(sdJwtVc.claims), id: \.key) { key, value in
+            ForEach(Array(credential.sdJwtVc.claims), id: \.key) { key, value in
                 BoldedLineItem(name: key, value: "\(value)")
             }
             Spacer()

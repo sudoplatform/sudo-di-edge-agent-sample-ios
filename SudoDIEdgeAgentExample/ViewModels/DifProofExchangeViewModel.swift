@@ -30,7 +30,7 @@ class DifProofExchangeViewModel: ObservableObject {
     @Published var difProofRequest: PresentationDefinitionV2
 
     /// Suitable credentialIds for the requested input descriptors
-    @Published var credentialsForRequestedDescriptors: [String: [Credential]] = [:]
+    @Published var credentialsForRequestedDescriptors: [String: [UICredential]] = [:]
 
     @Published var selectingCredentialForDescriptor: InputDescriptorV2?
     
@@ -62,10 +62,13 @@ class DifProofExchangeViewModel: ObservableObject {
                 }
                 
                 let uniqueCredIds = Set(credentialIdsForRequestedDescriptors.flatMap { $0.value })
-                let uniqueCreds = await retrieveFullCredentials(Array(uniqueCredIds))
+                let uniqueCreds = try await retrieveFullCredentials(Array(uniqueCredIds))
+                    .asyncCompactMap {
+                        try await UICredential.fromCredential(agent: Clients.agent, credential: $0)
+                    }
                 credentialsForRequestedDescriptors = credentialIdsForRequestedDescriptors.mapValues { credIds in
                     credIds.map { credId in
-                        uniqueCreds.first { $0.credentialId == credId }!
+                        uniqueCreds.first { $0.id == credId }!
                     }
                 }
             } catch {

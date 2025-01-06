@@ -11,7 +11,7 @@ import SwiftUI
 class CredentialExchangeViewModel: ObservableObject {
 
     /// The shown credential for the view
-    @Published var exchange: CredentialExchange
+    @Published var exchange: UICredentialExchange
     
     /// Shows when the exchange is loading (i.e. because an action is in progress)
     @Published var isLoading: Bool = false
@@ -22,7 +22,7 @@ class CredentialExchangeViewModel: ObservableObject {
     /// The message to show in the alert
     @Published var alertMessage: String = ""
 
-    init(exchange: CredentialExchange) {
+    init(exchange: UICredentialExchange) {
         self.exchange = exchange
     }
     
@@ -32,9 +32,10 @@ class CredentialExchangeViewModel: ObservableObject {
         Task { @MainActor in
             isLoading = true
             do {
-                let holderDid = try await idempotentCreateHolderDidKey(
+                let holderDid = try await idempotentCreateAppropriateHolderDid(
                     agent: Clients.agent,
-                    keyType: .ed25519
+                    allowedMethods: [.didKey],
+                    allowedKeyTypes: [.ed25519]
                 )
 
                 let configuration = AcceptCredentialOfferConfiguration.aries(.init(
@@ -45,10 +46,13 @@ class CredentialExchangeViewModel: ObservableObject {
                 ))
 
                 let updatedExchange = try await Clients.agent.credentials.exchange.acceptOffer(
-                    credentialExchangeId: exchange.credentialExchangeId,
+                    credentialExchangeId: exchange.exchange.credentialExchangeId,
                     configuration: configuration
                 )
-                exchange = updatedExchange
+                exchange = try await UICredentialExchange.fromCredentialExchange(
+                    agent: Clients.agent,
+                    exchange: updatedExchange
+                )
             } catch {
                 NSLog("Error accepting credential exchange \(error)")
                 showAlert = true
@@ -65,10 +69,13 @@ class CredentialExchangeViewModel: ObservableObject {
             isLoading = true
             do {
                 let updatedExchange = try await Clients.agent.credentials.exchange.openId4Vc.authorizeExchange(
-                    credentialExchangeId: exchange.credentialExchangeId,
+                    credentialExchangeId: exchange.exchange.credentialExchangeId,
                     configuration: .withPreAuthorization(txCode: txCode)
                 )
-                exchange = .openId4Vc(updatedExchange)
+                exchange = try await UICredentialExchange.fromCredentialExchange(
+                    agent: Clients.agent,
+                    exchange: .openId4Vc(updatedExchange)
+                )
             } catch {
                 NSLog("Error authorizing credential exchange \(error)")
                 showAlert = true
@@ -84,33 +91,36 @@ class CredentialExchangeViewModel: ObservableObject {
         Task { @MainActor in
             isLoading = true
             do {
-                var appropriateKeyTypes: [DidKeyType] = []
+                let allowedBindingMethods: OpenId4VcAllowedHolderBindingMethods
                 switch exchange {
                 case .openId4Vc(let oid4vc):
-                    let config = oid4vc.offeredCredentialConfigurations[credentialConfigurationId]
+                    let config = oid4vc.exchange.offeredCredentialConfigurations[credentialConfigurationId]
                     switch config {
                     case .sdJwtVc(let sdJwtConfig):
-                        appropriateKeyTypes = sdJwtConfig.allowedBindingMethods.allowedKeyTypes
-                    case nil: break
+                        allowedBindingMethods = sdJwtConfig.allowedBindingMethods
+                    case nil:
+                        throw "Could not find openid4vc credential configuration"
                     }
-                default: break
+                default: throw "Bad state: expected oid4vc exchange"
                 }
-                guard let keyType = appropriateKeyTypes.first else {
-                    throw "no appropriate did:key key type found accepting offer"
-                }
-                let holderDid = try await idempotentCreateHolderDidKey(
+                
+                let holderDid = try await idempotentCreateAppropriateHolderDid(
                     agent: Clients.agent,
-                    keyType: keyType
+                    allowedMethods: allowedBindingMethods.allowedDidMethods,
+                    allowedKeyTypes: allowedBindingMethods.allowedKeyTypes
                 )
                 
                 let updatedExchange = try await Clients.agent.credentials.exchange.acceptOffer(
-                    credentialExchangeId: exchange.credentialExchangeId,
+                    credentialExchangeId: exchange.exchange.credentialExchangeId,
                     configuration: .openId4Vc(.init(
                         credentialConfigurationId: credentialConfigurationId,
                         holderBinding: .withDid(did: holderDid)
                     ))
                 )
-                exchange = updatedExchange
+                exchange = try await UICredentialExchange.fromCredentialExchange(
+                    agent: Clients.agent,
+                    exchange: updatedExchange
+                )
             } catch {
                 NSLog("Error accepting credential exchange \(error)")
                 showAlert = true
@@ -126,13 +136,13 @@ class CredentialExchangeViewModel: ObservableObject {
             isLoading = true
             do {
                 _ = try await Clients.agent.credentials.exchange.storeCredential(
-                    credentialExchangeId: exchange.credentialExchangeId,
+                    credentialExchangeId: exchange.exchange.credentialExchangeId,
                     configuration: nil
                 )
                 // manually force openid4vc exchange into `done` state to trigger UI update
                 // in openid4vc flow
-                if case .openId4Vc(let ex) = exchange {
-                    exchange = .openId4Vc(.init(
+                if case .openId4Vc(let ex) = exchange.exchange {
+                    let updatedExchange = CredentialExchange.openId4Vc(.init(
                         credentialExchangeId: ex.credentialExchangeId,
                         credentialIds: ex.credentialIds,
                         errorMessage: ex.errorMessage,
@@ -144,6 +154,10 @@ class CredentialExchangeViewModel: ObservableObject {
                         offeredCredentialConfigurations: ex.offeredCredentialConfigurations,
                         issuedCredentialPreviews: ex.issuedCredentialPreviews
                     ))
+                    exchange = try await UICredentialExchange.fromCredentialExchange(
+                        agent: Clients.agent,
+                        exchange: updatedExchange
+                    )
                 }
             } catch {
                 NSLog("Error storing credential exchange \(error)")
@@ -155,38 +169,52 @@ class CredentialExchangeViewModel: ObservableObject {
     }
 }
 
-/// Creates an DID:KEY if one does not already exist.
-///
-/// Returns the new or existing did:key DID
-private func idempotentCreateHolderDidKey(
+/// Get an existing holder DID owned by the ``SudoDIEdgeAgent`` which meets the required
+/// [allowedMethods] & [allowedKeyTypes] criteria, or create a new one.
+private func idempotentCreateAppropriateHolderDid(
     agent: SudoDIEdgeAgent,
-    keyType: DidKeyType
+    allowedMethods: [DidMethod],
+    allowedKeyTypes: [DidKeyType]
 ) async throws -> String {
-    let dids = try await agent.dids.listAll(
-        options: ListDidsOptions(filters: ListDidsFilters(method: .didKey))
-    )
-    let existingDid = dids.first { isDidKeyOfKeyType(did: $0, keyType: keyType) }
+    let dids = try await agent.dids.listAll(options: .init(
+        filters: .init(
+            allowedDidMethods: allowedMethods,
+            allowedKeyTypes: allowedKeyTypes
+        )
+    ))
     
-    if let did = existingDid?.did {
-        return did
+    // return if exists
+    if let did = dids.first {
+        return did.did
     }
     
-    let newDid = try await agent.dids.createDid(
-        options: .didKey(keyType: keyType)
+    let newDid = try await createAppropriateHolderDid(
+        agent: agent,
+        allowedMethods: allowedMethods,
+        allowedKeyTypes: allowedKeyTypes
     )
     return newDid.did
 }
 
-private func isDidKeyOfKeyType(did: DidInformation, keyType: DidKeyType) -> Bool {
-    // FUTURE - this information will be contained in `DidInformation`
-    switch keyType {
-    case .ed25519:
-        // https://w3c-ccg.github.io/did-method-key/#ed25519-x25519
-        return did.did.starts(with: "did:key:z6Mk")
-    case .p256:
-        // https://w3c-ccg.github.io/did-method-key/#p-256
-        return did.did.starts(with: "did:key:zDn")
+private func createAppropriateHolderDid(
+    agent: SudoDIEdgeAgent,
+    allowedMethods: [DidMethod],
+    allowedKeyTypes: [DidKeyType]
+) async throws -> DidInformation {
+    guard let method = allowedMethods.first else {
+        throw "no suitable DID Method"
     }
+    guard let keyType = allowedKeyTypes.first else {
+        throw "no suitable key type"
+    }
+    
+    let options: CreateDidOptions
+    switch method {
+    case .didKey: options = .didKey(keyType: keyType)
+    case .didJwk: options = .didJwk(keyType: keyType)
+    }
+    
+    return try await agent.dids.createDid(options: options)
 }
 
 /// Conforms `AnoncredV1CredentialAttribute` to `Hashable` by combining all attributes together to

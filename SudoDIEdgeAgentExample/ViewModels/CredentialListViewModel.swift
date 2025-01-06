@@ -21,10 +21,10 @@ class CredentialListViewModel: ObservableObject {
     @Published var alertMessage: String = ""
 
     /// The list of credentials from the agent
-    @Published var credentials: [Credential] = []
+    @Published var credentials: [UICredential] = []
 
     /// The `Credential` that is presented in the sheet
-    @Published var presentedCredential: Credential?
+    @Published var presentedCredential: UICredential?
 
     // Empty initializer
     init() {}
@@ -35,7 +35,11 @@ class CredentialListViewModel: ObservableObject {
             isLoading = true
             do {
                 let result = try await Clients.agent.credentials.listAll(options: nil)
-                credentials = result.sorted { $0.createdAt ?? .now > $1.createdAt ?? .now }
+                credentials = try await result
+                    .sorted { $0.createdAt ?? .now > $1.createdAt ?? .now }
+                    .asyncCompactMap {
+                        try await UICredential.fromCredential(agent: Clients.agent, credential: $0)
+                    }
             } catch {
                 NSLog("Error getting credentials \(error.localizedDescription)")
                 showAlert = true
@@ -47,7 +51,7 @@ class CredentialListViewModel: ObservableObject {
 
     /// Method for swiping to delete a credential
     func delete(at offsets: IndexSet) {
-        let idsToDelete = offsets.map { credentials[$0].credentialId }
+        let idsToDelete = offsets.map { credentials[$0].id }
         _ = idsToDelete.compactMap({ id in
             Task { @MainActor [weak self] in
                 do {
@@ -63,7 +67,7 @@ class CredentialListViewModel: ObservableObject {
     }
 
     /// Shows the info of a given credential in a sheet
-    func showInfo(_ credential: Credential) {
+    func showInfo(_ credential: UICredential) {
         presentedCredential = credential
     }
 
@@ -86,29 +90,5 @@ extension Credential {
             .first { $0.name == "~created_timestamp" }
             .flatMap { Double($0.value) }
             .flatMap { Date(timeIntervalSince1970: $0) }
-    }
-}
-
-extension CredentialFormatData {
-    var previewName: String {
-        switch self {
-        case .w3c(let w3cCred):
-            return w3cCred.types.first { $0 != "VerifiableCredential" } ?? "VerifiableCredential"
-        case .anoncredV1(let metadata, _):
-            return metadata.credentialDefinitionInfo?.name ?? metadata.credentialDefinitionId
-        case .sdJwtVc(let cred):
-            return cred.verifiableCredentialType
-        }
-    }
-    
-    var formatPreviewName: String {
-        switch self {
-        case .anoncredV1:
-            return "Anoncred"
-        case .w3c:
-            return "W3C"
-        case .sdJwtVc:
-            return "SD-JWT VC"
-        }
     }
 }

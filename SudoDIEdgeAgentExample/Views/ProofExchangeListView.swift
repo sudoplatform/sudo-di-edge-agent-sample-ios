@@ -71,7 +71,7 @@ struct PresentButtonView: View {
                 switch proof {
                 case .aries(let aries):
                     switch aries.formatData {
-                    case .indy(let proofRequest):
+                    case .anoncred(let proofRequest):
                         AnoncredProofExchangeView(viewModel: .init(
                             proof: proof,
                             proofRequest: proofRequest

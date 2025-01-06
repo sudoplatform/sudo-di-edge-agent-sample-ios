@@ -47,3 +47,68 @@ extension Sequence {
 extension String: LocalizedError {
     public var errorDescription: String? { return self }
 }
+
+class PreviewDataHelper {
+    static let dummyUICredentialAnoncred = UICredential.anoncred(.init(
+        id: "1",
+        source: .didCommConnection(connectionId: "conn1"),
+        metadata: .init(
+            schema: .init(id: "schema1", authorId: "author1", name: "name", version: "1.0", attributeNames: ["foo", "bar"]),
+            credentialDefinition: .init(id: "cDef1", issuerId: "issuer1", schemaId: "schema1", tag: "1.0", isRevocable: true)
+        ),
+        credentialAttributes: [
+            .init(name: "first_name", value: "John", mimeType: nil),
+            .init(name: "family_name", value: "Doe", mimeType: nil)
+        ]
+    ))
+    
+    static let dummyUICredentialW3C = UICredential.w3c(.init(
+        id: "2",
+        source: .didCommConnection(connectionId: "conn2"),
+        w3cVc: .init(
+            contexts: [],
+            id: nil,
+            types: ["VerifiableCredential", "Sample"],
+            credentialSubject: [
+                .init(
+                    id: "did:example:123",
+                    properties: [
+                        "givenName": .string("John"),
+                        "familyName": .string("Smith")
+                    ]
+                ),
+                .init(
+                    id: "did:example:321",
+                    properties: [
+                        "givenName": .string("Peter"),
+                        "familyName": .string("Griffin")
+                    ]
+                )
+            ],
+            issuer: .init(id: "did:example:issuer123", properties: [:]),
+            issuanceDate: "2024-02-12T15:30:45.123Z",
+            expirationDate: nil,
+            proof: [],
+            properties: [:]
+        ),
+        proofType: .ecdsaSecp256r1Signature2019
+    ))
+    
+    static let dummyUICredentialSdJwtVc = UICredential.sdJwtVc(.init(
+        id: "3",
+        source: .openId4VcIssuer(issuerUrl: "https://issuer.foo"),
+        sdJwtVc: .init(
+            compactSdJwt: "foo.bar.xyz",
+            verifiableCredentialType: "ResidencyCard",
+            issuer: "did:foo:bar",
+            validAfter: nil,
+            validBefore: nil,
+            issuedAt: 1731369621,
+            keyBinding: nil,
+            claims: [
+                "given_name": .string(canSelectiveDisclose: true, data: "Hello"),
+                "family_name": .string(canSelectiveDisclose: true, data: "World")
+            ]
+        )
+    ))
+}

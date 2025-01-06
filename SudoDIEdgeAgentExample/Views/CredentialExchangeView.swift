@@ -49,29 +49,21 @@ struct CredentialExchangeView: View {
 }
 
 private struct AriesCredentialExchangeView: View {
-    var exchange: CredentialExchange.Aries
+    var exchange: UICredentialExchange.Aries
     var acceptCredential: () -> Void
     var onDismissRequest: () -> Void
     
     var body: some View {
         VStack {
-            switch exchange.formatData {
-            case .indy(let credentialMetadata, let credentialAttributes):
-                AnoncredCredentialInfoColumn(
-                    id: exchange.credentialExchangeId,
-                    fromSource: .didCommConnection(connectionId: exchange.connectionId),
-                    metadata: credentialMetadata,
-                    attributes: credentialAttributes
-                )
-            case .ariesLdProof(let currentProposedCredential, let currentProposedProofType):
-                W3cCredentialInfoColumn(
-                    id: exchange.credentialExchangeId,
-                    fromSource: .didCommConnection(connectionId: exchange.connectionId),
-                    w3cCredential: currentProposedCredential,
-                    proofType: currentProposedProofType
-                )
+            switch exchange.preview {
+            case .anoncred(let credential):
+                AnoncredCredentialInfoColumn(credential: credential)
+            case .w3c(let credential):
+                W3cCredentialInfoColumn(credential: credential)
+            case .sdJwtVc(let credential):
+                SdJwtCredentialInfoColumn(credential: credential)
             }
-            switch exchange.state {
+            switch exchange.exchange.state {
             case .offer:
                 Button(action: acceptCredential) {
                     Text("Accept")
@@ -96,7 +88,7 @@ private struct AriesCredentialExchangeView: View {
 }
 
 private struct OpenId4VcCredentialExchangeView: View {
-    var exchange: CredentialExchange.OpenId4Vc
+    var exchange: UICredentialExchange.OpenId4Vc
     var authorizeExchange: (String?) -> Void
     // config ID
     var acceptCredentialConfig: (String) -> Void
@@ -106,40 +98,22 @@ private struct OpenId4VcCredentialExchangeView: View {
     @State var txCodeInput: String = ""
     
     var body: some View {
-        let issuedCredential = exchange.issuedCredentialPreviews.first
+        let issuedCredential = exchange.issuedPreviews.first
         
         switch issuedCredential {
         // exchange in final state, just needs storage
         case .some(let cred):
             VStack {
                 switch cred {
-                case .anoncredV1(let credMetadata, let credAttributes):
-                    AnoncredCredentialInfoColumn(
-                        id: exchange.credentialExchangeId,
-                        fromSource: .openId4VcIssuer(
-                            issuerUrl: exchange.credentialIssuerUrl
-                        ),
-                        metadata: credMetadata,
-                        attributes: credAttributes
-                    )
-                case .w3c(let cred):
-                    W3cCredentialInfoColumn(
-                        id: exchange.credentialExchangeId,
-                        fromSource: .openId4VcIssuer(
-                            issuerUrl: exchange.credentialIssuerUrl
-                        ),
-                        w3cCredential: cred
-                    )
-                case .sdJwtVc(let cred):
-                    SdJwtCredentialInfoColumn(
-                        id: exchange.credentialExchangeId,
-                        fromSource: .openId4VcIssuer(
-                            issuerUrl: exchange.credentialIssuerUrl
-                        ),
-                        sdJwtVc: cred
-                    )
+                case .anoncred(let credential):
+                    AnoncredCredentialInfoColumn(credential: credential)
+                case .w3c(let credential):
+                    W3cCredentialInfoColumn(credential: credential)
+                case .sdJwtVc(let credential):
+                    SdJwtCredentialInfoColumn(credential: credential)
                 }
-                switch exchange.state {
+                    
+                switch exchange.exchange.state {
                 case .issued:
                     Button(action: storeCredential) {
                         Text("Store")
@@ -162,12 +136,12 @@ private struct OpenId4VcCredentialExchangeView: View {
             }
         // exchange not in issued/done state, ready to accept or authorize
         case nil:
-            let readyToAccept = exchange.state == .authorized
+            let readyToAccept = exchange.exchange.state == .authorized
             VStack {
                 // offered configurations
                 List {
                     ForEach(
-                        Array(exchange.offeredCredentialConfigurations),
+                        Array(exchange.exchange.offeredCredentialConfigurations),
                         id: \.key
                     ) { id, config in
                         HStack {
@@ -195,8 +169,8 @@ private struct OpenId4VcCredentialExchangeView: View {
                     }
                 }
                 Divider()
-                if exchange.state == .unauthorized {
-                    switch exchange.requiredAuthorization {
+                if exchange.exchange.state == .unauthorized {
+                    switch exchange.exchange.requiredAuthorization {
                     case .preAuthorized(let txCodeRequired):
                         if txCodeRequired != nil {
                             TextField(
@@ -243,26 +217,25 @@ struct AriesCredentialExchangeView_Previews: PreviewProvider {
     static var previews: some View {
         AriesCredentialExchangeView(
             exchange: .init(
-                credentialExchangeId: "credentialExchangeId",
-                credentialIds: ["credentialId"],
-                errorMessage: nil,
-                tags: [
-                    .init(name: "~created_timestamp", value: "1698891059")
-                ],
-                state: .offer,
-                connectionId: "connectionId",
-                initiator: .internal,
-                formatData: .indy(
-                    credentialMetadata: .init(
-                        credentialDefinitionId: "credentialDefinitionId",
-                        credentialDefinitionInfo: .init(name: "credentialDefinitionName"),
-                        schemaId: "schemaId",
-                        schemaInfo: .init(name: "schemaInfo", version: "1")),
-                    credentialAttributes: [
-                        .init(name: "attribute1", value: "value1", mimeType: "text/plain"),
-                        .init(name: "attribute2", value: "value2", mimeType: "text/plain")
-                    ]
-                )
+                exchange: .init(
+                    credentialExchangeId: "credentialExchangeId",
+                    credentialIds: ["credentialId"],
+                    errorMessage: nil,
+                    tags: [
+                        .init(name: "~created_timestamp", value: "1698891059")
+                    ],
+                    state: .offer,
+                    connectionId: "connectionId",
+                    initiator: .internal,
+                    formatData: .anoncred(
+                        credentialMetadata: .init(
+                            credentialDefinitionId: "",
+                            schemaId: ""
+                        ),
+                        credentialAttributes: []
+                    )
+                ),
+                preview: PreviewDataHelper.dummyUICredentialAnoncred
             ),
             acceptCredential: {},
             onDismissRequest: {}
@@ -276,29 +249,32 @@ struct OpenId4VcCredentialExchangeView_Previews: PreviewProvider {
         NavigationStack {
             OpenId4VcCredentialExchangeView(
                 exchange: .init(
-                    credentialExchangeId: "credentialExchangeId",
-                    credentialIds: ["credentialId"],
-                    errorMessage: nil,
-                    tags: [
-                        .init(name: "~created_timestamp", value: "1698891059")
-                    ],
-                    state: .authorized,
-                    credentialIssuerUrl: "https://issuer.foo",
-                    credentialIssuerDisplay: nil,
-                    requiredAuthorization: .preAuthorized(
-                        txCodeRequired: nil
+                    exchange: .init(
+                        credentialExchangeId: "credentialExchangeId",
+                        credentialIds: ["credentialId"],
+                        errorMessage: nil,
+                        tags: [
+                            .init(name: "~created_timestamp", value: "1698891059")
+                        ],
+                        state: .authorized,
+                        credentialIssuerUrl: "https://issuer.foo",
+                        credentialIssuerDisplay: nil,
+                        requiredAuthorization: .preAuthorized(
+                            txCodeRequired: nil
+                        ),
+                        offeredCredentialConfigurations: [
+                            "UniversityDegreeSdJwt": .sdJwtVc(.init(
+                                display: nil,
+                                allowedBindingMethods: .init(
+                                    allowedDidMethods: [],
+                                    allowedKeyTypes: []
+                                ),
+                                vct: "UniversityDegree",
+                                claims: [:]
+                            ))],
+                        issuedCredentialPreviews: []
                     ),
-                    offeredCredentialConfigurations: [
-                        "UniversityDegreeSdJwt": .sdJwtVc(.init(
-                            display: nil,
-                            allowedBindingMethods: .init(
-                                allowedDidMethods: [],
-                                allowedKeyTypes: []
-                            ),
-                            vct: "UniversityDegree",
-                            claims: [:]
-                        ))],
-                    issuedCredentialPreviews: []
+                    issuedPreviews: []
                 ),
                 authorizeExchange: { _ in },
                 acceptCredentialConfig: { _ in },

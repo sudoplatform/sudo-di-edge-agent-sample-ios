@@ -9,34 +9,31 @@ import SwiftUI
 import SudoDIEdgeAgent
 
 struct W3cCredentialInfoColumn: View {
-    var id: String
-    var fromSource: CredentialSource
-    var w3cCredential: W3cCredential
-    var proofType: JsonLdProofType?
+    var credential: UICredential.W3C
 
     var body: some View {
-        let credType = w3cCredential.types.first { $0 != "VerifiableCredential" } ?? "VerifiableCredential"
+        let credType = credential.w3cVc.types.first { $0 != "VerifiableCredential" } ?? "VerifiableCredential"
         
         VStack(alignment: .leading) {
-            BoldedLineItem(name: "ID", value: id)
-            switch fromSource {
+            BoldedLineItem(name: "ID", value: credential.id)
+            switch credential.source {
             case .didCommConnection(let connectionId):
                 BoldedLineItem(name: "From Connection", value: connectionId)
             case .openId4VcIssuer(let issuerUrl):
                 BoldedLineItem(name: "From OID Issuer", value: issuerUrl)
             }
             BoldedLineItem(name: "Format", value: "W3C")
-            BoldedLineItem(name: "Issuer", value: w3cCredential.issuer.id)
-            BoldedLineItem(name: "Issuance Date", value: w3cCredential.issuanceDate)
+            BoldedLineItem(name: "Issuer", value: credential.w3cVc.issuer.id)
+            BoldedLineItem(name: "Issuance Date", value: credential.w3cVc.issuanceDate)
             BoldedLineItem(name: "Type", value: credType)
-            if let proof = proofType {
+            if let proof = credential.proofType {
                 BoldedLineItem(name: "Issuer Proof Type", value: "\(proof)")
             }
 
             Divider()
 
             ForEach(
-                Array(zip(w3cCredential.credentialSubject.indices, w3cCredential.credentialSubject)),
+                Array(zip(credential.w3cVc.credentialSubject.indices, credential.w3cVc.credentialSubject)),
                 id: \.0
             ) { index, sub in
                 let credSubjectId = sub.id ?? "None"

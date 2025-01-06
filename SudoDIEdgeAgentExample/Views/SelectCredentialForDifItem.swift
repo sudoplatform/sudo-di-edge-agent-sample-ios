@@ -12,7 +12,7 @@ import SwiftUI
 struct SelectCredentialForDifItemView: View {
     /// The presentation credential information
     var inputDescriptor: InputDescriptorV2
-    var suitableCredentials: [Credential]
+    var suitableCredentials: [UICredential]
 
     /// Returns the selected identifier and credential id
     var onSelectCredential: (_ credId: String) -> Void
@@ -82,10 +82,10 @@ struct SelectCredentialForDifItemView: View {
                 if suitableCredentials.isEmpty {
                     Text("No suitable credentials found")
                 }
-                ForEach(suitableCredentials, id: \.credentialId) { cred in
+                ForEach(suitableCredentials) { cred in
                     SelectableCredentialCard(
                         cred: cred,
-                        onSelectCredential: onSelectCredential
+                        onSelectCredential: { onSelectCredential(cred.id) }
                     )
                 }
             }
@@ -95,8 +95,8 @@ struct SelectCredentialForDifItemView: View {
 }
 
 private struct SelectableCredentialCard: View {
-    let cred: Credential
-    let onSelectCredential: (_ credId: String) -> Void
+    let cred: UICredential
+    let onSelectCredential: () -> Void
 
     var body: some View {
         ZStack {
@@ -105,29 +105,16 @@ private struct SelectableCredentialCard: View {
                 .shadow(radius: 5)
 
             VStack(alignment: .leading) {
-                switch cred.formatData {
-                case .anoncredV1(let credentialMetadata, let credentialAttributes):
-                    AnoncredCredentialInfoColumn(
-                        id: cred.credentialId,
-                        fromSource: cred.credentialSource,
-                        metadata: credentialMetadata,
-                        attributes: credentialAttributes
-                    )
-                case .w3c(let w3c):
-                    W3cCredentialInfoColumn(
-                        id: cred.credentialId,
-                        fromSource: cred.credentialSource,
-                        w3cCredential: w3c
-                    )
-                case .sdJwtVc(let sdJwtVc):
-                    SdJwtCredentialInfoColumn(
-                        id: cred.credentialId,
-                        fromSource: cred.credentialSource,
-                        sdJwtVc: sdJwtVc
-                    )
+                switch cred {
+                case .anoncred(let credential):
+                    AnoncredCredentialInfoColumn(credential: credential)
+                case .w3c(let credential):
+                    W3cCredentialInfoColumn(credential: credential)
+                case .sdJwtVc(let credential):
+                    SdJwtCredentialInfoColumn(credential: credential)
                 }
                 Button("Select") {
-                    onSelectCredential(cred.credentialId)
+                    onSelectCredential()
                 }
                 .padding()
                 .frame(maxWidth: 90)
@@ -238,7 +225,12 @@ struct CredentialForDifItemView_Previews: PreviewProvider {
                 ),
                 group: []
             ),
-            suitableCredentials: [w3cCred, sdJwtVc, w3cCred],
+            suitableCredentials: [
+                PreviewDataHelper.dummyUICredentialW3C,
+                PreviewDataHelper.dummyUICredentialSdJwtVc,
+                PreviewDataHelper.dummyUICredentialW3C,
+                PreviewDataHelper.dummyUICredentialAnoncred
+            ],
             onSelectCredential: { print("Selected", $0) }
         )
     }

@@ -147,7 +147,7 @@ struct ProofExchangeView_Previews: PreviewProvider {
                 state: .presented,
                 connectionId: "connectionId",
                 initiator: .internal,
-                formatData: .indy(proofRequest: AnoncredProofRequestInfo(
+                formatData: .anoncred(proofRequest: AnoncredProofRequestInfo(
                     name: "Proof Req",
                     version: "1.0",
                     requestedAttributes: [:],

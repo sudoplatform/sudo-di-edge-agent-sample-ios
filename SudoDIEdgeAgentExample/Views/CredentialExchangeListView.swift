@@ -26,15 +26,15 @@ struct CredentialExchangeListView: View {
                         ForEach(viewModel.exchanges) { exchange in
                             HStack {
                                 VStack(alignment: .leading) {
-                                    Text(exchange.credentialExchangeId)
-                                    Text(exchange.previewExchangeType)
-                                    if let name = exchange.previewCredName {
+                                    Text(exchange.exchange.credentialExchangeId)
+                                    Text(exchange.exchangeTypeName)
+                                    if let name = exchange.credPreview?.previewName {
                                         Text(name)
                                     }
-                                    if let fmt = exchange.previewCredFormat {
+                                    if let fmt = exchange.credPreview?.previewFormat {
                                         Text(fmt)
                                     }
-                                    Text(viewModel.getState(exchange.state))
+                                    Text(viewModel.getState(exchange.exchange.state))
                                 }
                                 Spacer()
 

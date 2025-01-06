@@ -57,7 +57,10 @@ class Clients {
         let driver: LogDriverProtocol = NSLogDriver(level: .debug)
         self.logger = Logger(identifier: "di-edge-example", driver: driver)
 
-        guard let genesisFile = Bundle.main.url(forResource: "genesis_ledger.json", withExtension: nil) else {
+        guard let sovGenesisFile = Bundle.main.url(
+            forResource: "genesis_ledger.json",
+            withExtension: nil
+        ) else {
             fatalError("Failed to get genesis file")
         }
 
@@ -69,7 +72,13 @@ class Clients {
         mutliMessageSource.addMessageSource(messageSource: messageSource)
 
         self.agentConfiguration = AgentConfiguration(
-            genesisFiles: [genesisFile],
+            networkConfiguration: .init(
+                sovConfiguration: .init(
+                    genesisFiles: [sovGenesisFile],
+                    namespace: "indicio:testnet"
+                ),
+                cheqdConfiguration: NetworkConfiguration.Cheqd()
+            ),
             peerConnectionConfiguration: PeerConnectionConfiguration(label: "Sudo DI Agent iOS")
         )
         self.agent = try SudoDIEdgeAgentBuilder()

@@ -9,31 +9,17 @@ import SudoDIEdgeAgent
 
 // Since this view doesn't interact with the agent, there is no accompanying view model.
 struct CredentialView: View {
-    var credential: Credential
+    var credential: UICredential
 
     var body: some View {
         NavigationView {
-            switch credential.formatData {
-            case .anoncredV1(let credentialMetadata, let credentialAttributes):
-                AnoncredCredentialInfoColumn(
-                    id: credential.credentialId,
-                    fromSource: credential.credentialSource,
-                    metadata: credentialMetadata,
-                    attributes: credentialAttributes
-                )
-            case .w3c(let w3cCred):
-                W3cCredentialInfoColumn(
-                    id: credential.credentialId,
-                    fromSource: credential.credentialSource,
-                    w3cCredential: w3cCred,
-                    proofType: w3cCred.proof?.first?.proofType
-                )
-            case .sdJwtVc(let sdJwtVc):
-                SdJwtCredentialInfoColumn(
-                    id: credential.credentialId,
-                    fromSource: credential.credentialSource,
-                    sdJwtVc: sdJwtVc
-                )
+            switch credential {
+            case .anoncred(let credential):
+                AnoncredCredentialInfoColumn(credential: credential)
+            case .w3c(let credential):
+                W3cCredentialInfoColumn(credential: credential)
+            case .sdJwtVc(let credential):
+                SdJwtCredentialInfoColumn(credential: credential)
             }
         }
     }
@@ -42,25 +28,7 @@ struct CredentialView: View {
 struct CredentialView_Previews: PreviewProvider {
     static var previews: some View {
         CredentialView(
-            credential: .init(
-                credentialId: "credentialId", 
-                credentialExchangeId: "credentialExchangeId",
-                credentialSource: .didCommConnection(connectionId: "connectionId"),
-                formatData: .anoncredV1(
-                    credentialMetadata: .init(
-                        credentialDefinitionId: "credentialDefinitionId",
-                        credentialDefinitionInfo: .init(name: "credentialDefinitionName"),
-                        schemaId: "schemaId",
-                        schemaInfo: .init(name: "schemaInfo", version: "1")),
-                    credentialAttributes: [
-                        .init(name: "attribute1", value: "value1", mimeType: "text/plain"),
-                        .init(name: "attribute2", value: "value2", mimeType: "text/plain")
-                    ]
-                ),
-                tags: [
-                    .init(name: "~created_timestamp", value: "1698891059")
-                ]
-            )
+            credential: PreviewDataHelper.dummyUICredentialAnoncred
         )
     }
 }

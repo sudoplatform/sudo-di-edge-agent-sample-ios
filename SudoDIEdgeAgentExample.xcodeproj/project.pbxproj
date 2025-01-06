@@ -13,6 +13,8 @@
 		2F54B6D82BFC36D70096E1A4 /* SudoDIRelayMessageSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F54B6D72BFC36D70096E1A4 /* SudoDIRelayMessageSource.swift */; };
 		2F54B6DB2BFC5F480096E1A4 /* AnoncredCredentialInfoColumn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F54B6DA2BFC5F480096E1A4 /* AnoncredCredentialInfoColumn.swift */; };
 		2F54B6DD2BFC60910096E1A4 /* W3cCredentialInfoColumn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F54B6DC2BFC60910096E1A4 /* W3cCredentialInfoColumn.swift */; };
+		2F556A0E2D15277D00815799 /* UICredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F556A0D2D15277D00815799 /* UICredential.swift */; };
+		2F556A102D15303000815799 /* UICredentialExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F556A0F2D15303000815799 /* UICredentialExchange.swift */; };
 		2F7AFD562CDDE3ED00BBD364 /* SdJwtCredentialInfoColumn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7AFD552CDDE3ED00BBD364 /* SdJwtCredentialInfoColumn.swift */; };
 		2F8F162D2BFDB8DD00BE1D22 /* ConnectionInvitationCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F8F162C2BFDB8DD00BE1D22 /* ConnectionInvitationCreateView.swift */; };
 		2F8F162F2BFDB97F00BE1D22 /* ConnectionInvitationCreateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F8F162E2BFDB97F00BE1D22 /* ConnectionInvitationCreateViewModel.swift */; };
@@ -61,6 +63,8 @@
 		2F54B6D72BFC36D70096E1A4 /* SudoDIRelayMessageSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoDIRelayMessageSource.swift; sourceTree = "<group>"; };
 		2F54B6DA2BFC5F480096E1A4 /* AnoncredCredentialInfoColumn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnoncredCredentialInfoColumn.swift; sourceTree = "<group>"; };
 		2F54B6DC2BFC60910096E1A4 /* W3cCredentialInfoColumn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = W3cCredentialInfoColumn.swift; sourceTree = "<group>"; };
+		2F556A0D2D15277D00815799 /* UICredential.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICredential.swift; sourceTree = "<group>"; };
+		2F556A0F2D15303000815799 /* UICredentialExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICredentialExchange.swift; sourceTree = "<group>"; };
 		2F7AFD542CDD9ABF00BBD364 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		2F7AFD552CDDE3ED00BBD364 /* SdJwtCredentialInfoColumn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SdJwtCredentialInfoColumn.swift; sourceTree = "<group>"; };
 		2F8F162C2BFDB8DD00BE1D22 /* ConnectionInvitationCreateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionInvitationCreateView.swift; sourceTree = "<group>"; };
@@ -130,6 +134,15 @@
 				2F7AFD552CDDE3ED00BBD364 /* SdJwtCredentialInfoColumn.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		2F556A0C2D15276C00815799 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				2F556A0D2D15277D00815799 /* UICredential.swift */,
+				2F556A0F2D15303000815799 /* UICredentialExchange.swift */,
+			);
+			path = Common;
 			sourceTree = "<group>";
 		};
 		55465700F97B1A38CCE7E7DB /* Pods */ = {
@@ -222,6 +235,7 @@
 		CEC416782ADEF395001A3CFD /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				2F556A0C2D15276C00815799 /* Common */,
 				CEC4167F2ADF2313001A3CFD /* RegisterViewModel.swift */,
 				CE1246692AE2F9440042EC91 /* HomeViewModel.swift */,
 				CE1246732AE716A10042EC91 /* ConnectionExchangeViewModel.swift */,
@@ -391,9 +405,11 @@
 				2F8F162D2BFDB8DD00BE1D22 /* ConnectionInvitationCreateView.swift in Sources */,
 				CE1246742AE716A10042EC91 /* ConnectionExchangeViewModel.swift in Sources */,
 				CE09F7462AF59B80006A7EF6 /* SelectCredentialForAnoncredItem.swift in Sources */,
+				2F556A0E2D15277D00815799 /* UICredential.swift in Sources */,
 				CE6B83B72AF2B374002D5B7F /* CredentialExchangeListViewModel.swift in Sources */,
 				CEC4167C2ADF0171001A3CFD /* RegisterView.swift in Sources */,
 				CE6B83B12AF18DE6002D5B7F /* ConnectionViewModel.swift in Sources */,
+				2F556A102D15303000815799 /* UICredentialExchange.swift in Sources */,
 				CE09F7342AF2E4FD006A7EF6 /* CredentialExchangeViewModel.swift in Sources */,
 				CE09F7442AF427C6006A7EF6 /* AnoncredProofExchangeViewModel.swift in Sources */,
 				2F54B6DB2BFC5F480096E1A4 /* AnoncredCredentialInfoColumn.swift in Sources */,

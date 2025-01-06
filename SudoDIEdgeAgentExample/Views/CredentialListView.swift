@@ -22,9 +22,9 @@ struct CredentialListView: View {
                         ForEach(viewModel.credentials) { credential in
                             HStack {
                                 VStack(alignment: .leading) {
-                                    Text(credential.credentialId)
-                                    Text(credential.formatData.previewName)
-                                    Text(credential.formatData.formatPreviewName)
+                                    Text(credential.id)
+                                    Text(credential.previewName)
+                                    Text(credential.previewFormat)
                                 }
                                 Spacer()
 

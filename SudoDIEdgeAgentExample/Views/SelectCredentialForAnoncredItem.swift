@@ -87,9 +87,7 @@ struct CredentialForItemView_Previews: PreviewProvider {
                         formatData: .anoncredV1(
                             credentialMetadata: .init(
                                 credentialDefinitionId: "credentialDefinitionId",
-                                credentialDefinitionInfo: .init(name: "credentialDefinitionName"),
-                                schemaId: "schemaId",
-                                schemaInfo: .init(name: "schemaInfo", version: "1")
+                                schemaId: "schemaId"
                             ),
                             credentialAttributes: [
                                 .init(name: "attribute1", value: "value1", mimeType: "text/plain"),
@@ -107,9 +105,7 @@ struct CredentialForItemView_Previews: PreviewProvider {
                         formatData: .anoncredV1(
                             credentialMetadata: .init(
                                 credentialDefinitionId: "credentialDefinitionId",
-                                credentialDefinitionInfo: .init(name: "credentialDefinitionName"),
-                                schemaId: "schemaId",
-                                schemaInfo: .init(name: "schemaInfo", version: "1")
+                                schemaId: "schemaId"
                             ),
                             credentialAttributes: [
                                 .init(name: "attribute1", value: "value1", mimeType: "text/plain"),

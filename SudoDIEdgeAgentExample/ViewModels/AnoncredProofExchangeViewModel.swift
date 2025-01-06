@@ -83,7 +83,7 @@ class AnoncredProofExchangeViewModel: ObservableObject {
             isLoading = true
             NSLog("Retrieving attribute and predicate requests...")
             do {
-                guard case .indy(
+                guard case .anoncred(
                     let credentialsForRequestedAttributes,
                     let credentialsForRequestedPredicates,
                     let selfAttestableAttributes
@@ -196,7 +196,7 @@ class AnoncredProofExchangeViewModel: ObservableObject {
         Task { @MainActor in
             isLoading = true
             NSLog("Presenting credentials for proof...")
-            let presentationCreds = PresentationCredentials.indy(
+            let presentationCreds = PresentationCredentials.anoncred(
                 credentialsForRequestedAttributes: selectedCredentialsForAttributeGroups.mapValues { 
                     AnoncredPresentationAttributeGroup(credentialId: $0, revealed: true)
                 },
