@@ -13,6 +13,9 @@ class CredentialExchangeViewModel: ObservableObject {
     /// The shown credential for the view
     @Published var exchange: UICredentialExchange
     
+    /// DIDs owned by the agent which have been found as suitable for binding in the exchange
+    @Published var suitableDids: SuitableDidsForExchange?
+    
     /// Shows when the exchange is loading (i.e. because an action is in progress)
     @Published var isLoading: Bool = false
 
@@ -26,18 +29,64 @@ class CredentialExchangeViewModel: ObservableObject {
         self.exchange = exchange
     }
     
-    /// Accepts a given aries-based `CredentialExchange` offer.
-    /// The viewmodel `exchange` is updated on success.
-    func acceptAries() {
+    /// Construct the ``SuitableDidsForExchange`` object for the `exchange`, then update the
+    /// UI's state for this variable.
+    ///
+    /// The ``SuitableDidsForExchange`` are loaded by determining the restrictions of the incoming
+    /// `exchange` and filtering for DIDs which satisfy that.
+    func loadSuitableDids() {
         Task { @MainActor in
             isLoading = true
             do {
-                let holderDid = try await idempotentCreateAppropriateHolderDid(
-                    agent: Clients.agent,
-                    allowedMethods: [.didKey],
-                    allowedKeyTypes: [.ed25519]
-                )
-
+                switch exchange {
+                case .aries(let aries):
+                    switch aries.exchange.formatData {
+                    case .anoncred:
+                        suitableDids = .aries(.notApplicable)
+                    case .ariesLdProof:
+                        // technically no restrictions are made by aries ldp exchange, but we
+                        // make restrictions anyway based on common aries demo configurations
+                        let restrictions = ListDidsFilters(
+                            allowedDidMethods: [.didKey],
+                            allowedKeyTypes: [.ed25519, .p256]
+                        )
+                        let dids = try await Clients.agent.dids.listAll(
+                            options: .init(filters: restrictions)
+                        )
+                        suitableDids = .aries(.ldProof(dids: .init(
+                            dids: dids,
+                            restriction: restrictions
+                        )))
+                    }
+                case .openId4Vc(let openId4Vc):
+                    let configMap = openId4Vc.exchange.offeredCredentialConfigurations
+                    let mapping = try await configMap.asyncCompactMap { k, v in
+                        let restrictions = ListDidsFilters(
+                            allowedDidMethods: v.allowedBindingMethods.allowedDidMethods,
+                            allowedKeyTypes: v.allowedBindingMethods.allowedKeyTypes
+                        )
+                        let dids = try await Clients.agent.dids.listAll(
+                            options: .init(filters: restrictions)
+                        )
+                        return DidsForRestriction(id: k, dids: dids, restriction: restrictions)
+                    }
+                    suitableDids = .openId4Vc(.init(didsByConfigurationId: mapping))
+                }
+            } catch {
+                NSLog("Error loading suitable DIDs \(error)")
+                showAlert = true
+                alertMessage = error.localizedDescription
+            }
+            isLoading = false
+        }
+    }
+    
+    /// Accepts a given aries-based `CredentialExchange` offer.
+    /// The viewmodel `exchange` is updated on success.
+    func acceptAries(holderDid: String?) {
+        Task { @MainActor in
+            isLoading = true
+            do {
                 let configuration = AcceptCredentialOfferConfiguration.aries(.init(
                     autoStoreCredential: true,
                     formatSpecificConfiguration: .ariesLdProofVc(
@@ -87,29 +136,10 @@ class CredentialExchangeViewModel: ObservableObject {
     
     /// Accepts a given openid4vc-based `CredentialExchange` offer.
     /// The viewmodel `exchange` is updated on success.
-    func acceptOpenId4Vc(credentialConfigurationId: String) {
+    func acceptOpenId4Vc(credentialConfigurationId: String, holderDid: String) {
         Task { @MainActor in
             isLoading = true
             do {
-                let allowedBindingMethods: OpenId4VcAllowedHolderBindingMethods
-                switch exchange {
-                case .openId4Vc(let oid4vc):
-                    let config = oid4vc.exchange.offeredCredentialConfigurations[credentialConfigurationId]
-                    switch config {
-                    case .sdJwtVc(let sdJwtConfig):
-                        allowedBindingMethods = sdJwtConfig.allowedBindingMethods
-                    case nil:
-                        throw "Could not find openid4vc credential configuration"
-                    }
-                default: throw "Bad state: expected oid4vc exchange"
-                }
-                
-                let holderDid = try await idempotentCreateAppropriateHolderDid(
-                    agent: Clients.agent,
-                    allowedMethods: allowedBindingMethods.allowedDidMethods,
-                    allowedKeyTypes: allowedBindingMethods.allowedKeyTypes
-                )
-                
                 let updatedExchange = try await Clients.agent.credentials.exchange.acceptOffer(
                     credentialExchangeId: exchange.exchange.credentialExchangeId,
                     configuration: .openId4Vc(.init(
@@ -166,6 +196,60 @@ class CredentialExchangeViewModel: ObservableObject {
             }
             isLoading = false
         }
+    }
+}
+
+/// Application logic data structure for representing the list of DIDs which have been
+/// determined as suitable for holder binding in the given exchange.
+enum SuitableDidsForExchange {
+    case aries(Aries)
+    case openId4Vc(OpenId4Vc)
+    
+    enum Aries {
+        /// Aries exchange is an LD Proof exchange, contains list of appropriate DIDs
+        case ldProof(dids: DidsForRestriction)
+        
+        /// Aries exchange does not need a DID binding (e.g. anoncreds)
+        case notApplicable
+    }
+    
+    /// OpenID4VC exchange, contains the set of suitable DIDs for each configuration
+    /// being offered.
+    struct OpenId4Vc {
+        let didsByConfigurationId: [String: DidsForRestriction]
+    }
+    
+    func asAries() -> Aries? {
+        switch self {
+        case .aries(let aries):
+            return aries
+        case .openId4Vc:
+            return nil
+        }
+    }
+    
+    func asOpenId4Vc() -> OpenId4Vc? {
+        switch self {
+        case .aries:
+            return nil
+        case .openId4Vc(let openId4Vc):
+            return openId4Vc
+        }
+    }
+}
+
+/// Set of DIDs that are appropriate, and the restrictions which those DIDs were checked
+/// against (i.e. the restricted DIDs method and key types)
+struct DidsForRestriction: Identifiable {
+    var id: String
+    
+    let dids: [DidInformation]
+    let restriction: ListDidsFilters
+    
+    public init(id: String = UUID().uuidString, dids: [DidInformation], restriction: ListDidsFilters) {
+        self.id = id
+        self.dids = dids
+        self.restriction = restriction
     }
 }
 

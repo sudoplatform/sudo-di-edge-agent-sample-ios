@@ -58,35 +58,22 @@ struct ConnectionExchangeView: View {
                         Text("Refresh")
                     }
                 }
-                .padding()
-                .frame(width: 200)
-                .background(.blue)
-                .foregroundStyle(.white)
-                .clipShape(Capsule())
+                .standardButtonTheme()
                 .disabled(viewModel.isLoading)
 
                 Button("Accept Invitation") {
                     viewModel.isPresentingScanner = true
                 }
-                    .padding()
-                    .frame(width: 200)
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .clipShape(Capsule())
-                    .disabled(viewModel.isLoading)
-                
-                    NavigationLink("Create Invitation") {
-                        ConnectionInvitationCreateView(
-                            viewModel: .init()
-                        )
-                    }
-                
-                    .padding()
-                    .frame(width: 200)
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .clipShape(Capsule())
-                    .disabled(viewModel.isLoading)
+                .standardButtonTheme()
+                .disabled(viewModel.isLoading)
+            
+                NavigationLink("Create Invitation") {
+                    ConnectionInvitationCreateView(
+                        viewModel: .init()
+                    )
+                }
+                .standardButtonTheme()
+                .disabled(viewModel.isLoading)
             }
             .navigationTitle("Connections Exchange")
         }

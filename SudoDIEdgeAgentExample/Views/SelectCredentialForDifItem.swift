@@ -176,6 +176,7 @@ struct CredentialForDifItemView_Previews: PreviewProvider {
                 validAfter: nil,
                 validBefore: nil,
                 issuedAt: 1731369621,
+                subject: "did:foo:sub",
                 keyBinding: nil,
                 claims: [
                     "given_name": .string(canSelectiveDisclose: true, data: "Hello"),

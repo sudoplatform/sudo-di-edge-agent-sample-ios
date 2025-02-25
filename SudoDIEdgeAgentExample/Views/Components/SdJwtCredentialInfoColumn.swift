@@ -25,6 +25,9 @@ struct SdJwtCredentialInfoColumn: View {
             if let iat = credential.sdJwtVc.issuedAt {
                 BoldedLineItem(name: "Issuance Date", value: "\(iat)")
             }
+            if let sub = credential.sdJwtVc.subject {
+                BoldedLineItem(name: "Subject", value: sub)
+            }
             BoldedLineItem(name: "Type", value: credential.sdJwtVc.verifiableCredentialType)
 
             Divider()

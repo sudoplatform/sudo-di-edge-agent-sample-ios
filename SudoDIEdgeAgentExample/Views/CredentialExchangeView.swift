@@ -10,27 +10,34 @@ import SudoDIEdgeAgent
 struct CredentialExchangeView: View {
     @StateObject var viewModel: CredentialExchangeViewModel
     var onDismissRequest: () -> Void
+    
 
     var body: some View {
         NavigationView {
-            if viewModel.isLoading {
+            if viewModel.isLoading || viewModel.suitableDids == nil {
                 ProgressView()
             } else {
+
                 switch viewModel.exchange {
                 case .aries(let exchange): AriesCredentialExchangeView(
                     exchange: exchange,
-                    acceptCredential: {
-                        viewModel.acceptAries()
+                    suitableDidsForExchange: viewModel.suitableDids!.asAries()!,
+                    acceptCredential: { did in
+                        viewModel.acceptAries(holderDid: did)
                     },
                     onDismissRequest: onDismissRequest
                 )
                 case .openId4Vc(let exchange): OpenId4VcCredentialExchangeView(
                     exchange: exchange,
+                    suitableDidsForExchange: viewModel.suitableDids!.asOpenId4Vc()!,
                     authorizeExchange: { txCode in
                         viewModel.authorizeExchange(txCode: txCode)
                     },
-                    acceptCredentialConfig: { configId in
-                        viewModel.acceptOpenId4Vc(credentialConfigurationId: configId)
+                    acceptCredential: { configId, did in
+                        viewModel.acceptOpenId4Vc(
+                            credentialConfigurationId: configId,
+                            holderDid: did
+                        )
                     },
                     storeCredential: {
                         viewModel.storeCredential()
@@ -40,6 +47,7 @@ struct CredentialExchangeView: View {
                 }
             }
         }
+        .task { viewModel.loadSuitableDids() }
         .alert("Error", isPresented: $viewModel.showAlert) {
             Button("OK") {}
         } message: {
@@ -50,8 +58,13 @@ struct CredentialExchangeView: View {
 
 private struct AriesCredentialExchangeView: View {
     var exchange: UICredentialExchange.Aries
-    var acceptCredential: () -> Void
+    var suitableDidsForExchange: SuitableDidsForExchange.Aries
+    var acceptCredential: (String?) -> Void
     var onDismissRequest: () -> Void
+    
+    /// state for the list of DIDs which are actively being selected from. Non-nil when a selection is
+    /// in progress (e.g. for an aries ldp exchange)
+    @State var selectDidList: DidsForRestriction?
     
     var body: some View {
         VStack {
@@ -65,37 +78,48 @@ private struct AriesCredentialExchangeView: View {
             }
             switch exchange.exchange.state {
             case .offer:
-                Button(action: acceptCredential) {
-                    Text("Accept")
+                Button("Accept") {
+                    switch suitableDidsForExchange {
+                    // must select a DID
+                    case .ldProof(let dids):
+                        selectDidList = dids
+                    // no DID needed
+                    case .notApplicable:
+                        acceptCredential(nil)
+                    }
                 }
-                .padding()
-                .frame(width: 200)
-                .background(.blue)
-                .foregroundStyle(.white)
-                .clipShape(Capsule())
+                .standardButtonTheme()
             default:
                 Button(action: onDismissRequest) {
                     Text("Done")
                 }
-                .padding()
-                .frame(width: 200)
-                .background(.blue)
-                .foregroundStyle(.white)
-                .clipShape(Capsule())
+                .standardButtonTheme()
             }
+        }
+        .sheet(item: $selectDidList) { suitableDids in
+            SelectDidModal(didList: suitableDids, onSelect: { did in
+                acceptCredential(did)
+                selectDidList = nil
+            })
         }
     }
 }
 
 private struct OpenId4VcCredentialExchangeView: View {
     var exchange: UICredentialExchange.OpenId4Vc
-    var authorizeExchange: (String?) -> Void
-    // config ID
-    var acceptCredentialConfig: (String) -> Void
+    var suitableDidsForExchange: SuitableDidsForExchange.OpenId4Vc
+    /// authorize an exchange with a TX Code
+    var authorizeExchange: (_ txCode: String?) -> Void
+    /// accept a credential for the given configuration ID and the DID to bind.
+    var acceptCredential: (_ config: String, _ did: String) -> Void
     var storeCredential: () -> Void
     var onDismissRequest: () -> Void
     
     @State var txCodeInput: String = ""
+
+    /// state for the list of DIDs which are actively being selected from. Non-nil when a selection is
+    /// in progress (e.g. for a specific configuration)
+    @State var selectDidListForConfigId: DidsForRestriction?
     
     var body: some View {
         let issuedCredential = exchange.issuedPreviews.first
@@ -118,20 +142,12 @@ private struct OpenId4VcCredentialExchangeView: View {
                     Button(action: storeCredential) {
                         Text("Store")
                     }
-                    .padding()
-                    .frame(width: 200)
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .clipShape(Capsule())
+                    .standardButtonTheme()
                 default:
                     Button(action: onDismissRequest) {
                         Text("Done")
                     }
-                    .padding()
-                    .frame(width: 200)
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .clipShape(Capsule())
+                    .standardButtonTheme()
                 }
             }
         // exchange not in issued/done state, ready to accept or authorize
@@ -156,7 +172,8 @@ private struct OpenId4VcCredentialExchangeView: View {
 
                             if readyToAccept {
                                 Button("Accept") {
-                                    acceptCredentialConfig(id)
+                                    let didsForConfig = suitableDidsForExchange.didsByConfigurationId[id]
+                                    selectDidListForConfigId = didsForConfig
                                 }
                                 .frame(maxWidth: 55)
                                 .padding()
@@ -188,13 +205,16 @@ private struct OpenId4VcCredentialExchangeView: View {
                             authorizeExchange(nil)
                         }
                     }
-                    .padding()
-                    .frame(width: 200)
-                    .background(.blue)
-                    .foregroundStyle(.white)
-                    .clipShape(Capsule())
+                    .standardButtonTheme()
                 }
-            }.navigationTitle("Offered Credentials")
+            }
+            .navigationTitle("Offered Credentials")
+            .sheet(item: $selectDidListForConfigId) { suitableDids in
+                SelectDidModal(didList: suitableDids, onSelect: { did in
+                    acceptCredential(suitableDids.id, did)
+                    selectDidListForConfigId = nil
+                })
+            }
         }
     }
 }
@@ -213,7 +233,44 @@ struct BoldedLineItem: View {
     }
 }
 
-struct AriesCredentialExchangeView_Previews: PreviewProvider {
+/// Content of modal in which a DID should be selected. On selection, the `onSelect`
+/// callback is invoked.
+struct SelectDidModal: View {
+    var didList: DidsForRestriction
+    var onSelect: (_ did: String) -> Void
+    
+    @State private var selection: String?
+
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Select a DID to bind:")
+                .font(.title3)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+            
+            if didList.dids.isEmpty {
+                Text("No suitable DIDs found")
+                Text("Please create a DID satsifying the following: \(didList.restriction)")
+                Spacer()
+            } else {
+                List(didList.dids, selection: $selection) {
+                    let did = $0
+                    VStack(alignment: .leading) {
+                        Text(did.did).lineLimit(1)
+                        Text("Alias: \(did.alias ?? "None")")
+                    }
+                }
+                .onChange(of: selection) { newSelection in
+                    guard let did = newSelection else { return }
+                    onSelect(did)
+                }
+            }
+        }
+    }
+}
+
+struct AriesAnoncredsCredentialExchangeView_Previews: PreviewProvider {
     static var previews: some View {
         AriesCredentialExchangeView(
             exchange: .init(
@@ -237,14 +294,110 @@ struct AriesCredentialExchangeView_Previews: PreviewProvider {
                 ),
                 preview: PreviewDataHelper.dummyUICredentialAnoncred
             ),
-            acceptCredential: {},
+            suitableDidsForExchange: .notApplicable,
+            acceptCredential: { _ in },
             onDismissRequest: {}
         )
         
     }
 }
 
-struct OpenId4VcCredentialExchangeView_Previews: PreviewProvider {
+struct AriesLdpCredentialExchangeView_Previews: PreviewProvider {
+    static var previews: some View {
+        AriesCredentialExchangeView(
+            exchange: .init(
+                exchange: .init(
+                    credentialExchangeId: "credentialExchangeId",
+                    credentialIds: ["credentialId"],
+                    errorMessage: nil,
+                    tags: [
+                        .init(name: "~created_timestamp", value: "1698891059")
+                    ],
+                    state: .offer,
+                    connectionId: "connectionId",
+                    initiator: .internal,
+                    formatData: .ariesLdProof(
+                        currentProposedCredential: PreviewDataHelper.dummyW3cCredential,
+                        currentProposedProofType: .ed25519Signature2018
+                    )
+                ),
+                preview: PreviewDataHelper.dummyUICredentialAnoncred
+            ),
+            suitableDidsForExchange: .ldProof(dids: .init(
+                dids: [
+                    .init(
+                        did: "did:key:abc",
+                        methodData: .didKey(keyType: .p256),
+                        tags: [RecordTag(name: "alias", value: "Work DID")]
+                    ),
+                    .init(
+                        did: "did:key:xyz",
+                        methodData: .didKey(keyType: .ed25519),
+                        tags: [RecordTag(name: "alias", value: "School DID")]
+                    ),
+                    .init(
+                        did: "did:jwk:abc",
+                        methodData: .didJwk(keyType: .ed25519),
+                        tags: []
+                    )
+                ],
+                restriction: .init()
+            )),
+            acceptCredential: { _ in },
+            onDismissRequest: {}
+        )
+        
+    }
+}
+
+struct OpenId4VcUnauthorizedCredentialExchangeView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationStack {
+            OpenId4VcCredentialExchangeView(
+                exchange: .init(
+                    exchange: .init(
+                        credentialExchangeId: "credentialExchangeId",
+                        credentialIds: ["credentialId"],
+                        errorMessage: nil,
+                        tags: [
+                            .init(name: "~created_timestamp", value: "1698891059")
+                        ],
+                        state: .unauthorized,
+                        credentialIssuerUrl: "https://issuer.foo",
+                        credentialIssuerDisplay: nil,
+                        requiredAuthorization: .preAuthorized(
+                            txCodeRequired: .init(
+                                lengthHint: nil,
+                                description: nil
+                            )
+                        ),
+                        offeredCredentialConfigurations: [
+                            "UniversityDegreeSdJwt": .sdJwtVc(.init(
+                                display: nil,
+                                allowedBindingMethods: .init(
+                                    allowedDidMethods: [],
+                                    allowedKeyTypes: []
+                                ),
+                                vct: "UniversityDegree",
+                                claims: [:]
+                            ))],
+                        issuedCredentialPreviews: []
+                    ),
+                    issuedPreviews: []
+                ),
+                suitableDidsForExchange: .init(
+                    didsByConfigurationId: [:]
+                ),
+                authorizeExchange: { _ in },
+                acceptCredential: { _, _ in },
+                storeCredential: {},
+                onDismissRequest: {}
+            )
+        }
+    }
+}
+
+struct OpenId4VcAuthorizedCredentialExchangeView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
             OpenId4VcCredentialExchangeView(
@@ -276,8 +429,27 @@ struct OpenId4VcCredentialExchangeView_Previews: PreviewProvider {
                     ),
                     issuedPreviews: []
                 ),
+                suitableDidsForExchange: .init(
+                    didsByConfigurationId: [
+                        "UniversityDegreeSdJwt": .init(
+                            dids: [
+                                .init(
+                                    did: "did:key:xyz",
+                                    methodData: .didKey(keyType: .ed25519),
+                                    tags: [RecordTag(name: "alias", value: "School DID")]
+                                ),
+                                .init(
+                                    did: "did:jwk:abc",
+                                    methodData: .didJwk(keyType: .ed25519),
+                                    tags: []
+                                )
+                            ],
+                            restriction: .init()
+                        )
+                    ]
+                ),
                 authorizeExchange: { _ in },
-                acceptCredentialConfig: { _ in },
+                acceptCredential: { _, _ in },
                 storeCredential: {},
                 onDismissRequest: {}
             )

@@ -61,11 +61,7 @@ struct DifProofExchangeView: View {
                         Text("Present")
                     }
                 }
-                .padding()
-                .frame(width: 200)
-                .background(.blue)
-                .foregroundStyle(.white)
-                .clipShape(Capsule())
+                .standardButtonTheme()
                 .disabled(viewModel.isLoading)
             }
             .padding()

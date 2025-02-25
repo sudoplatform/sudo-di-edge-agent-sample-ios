@@ -39,12 +39,8 @@ struct RegisterView: View {
                             Text("Unlock")
                         }
                     }
-                        .padding()
-                        .frame(width: 200)
-                        .background(.blue)
-                        .foregroundStyle(.white)
-                        .clipShape(Capsule())
-                        .disabled(viewModel.isLoading || viewModel.isResetting)
+                    .standardButtonTheme()
+                    .disabled(viewModel.isLoading || viewModel.isResetting)
                 }
                 .padding()
             }

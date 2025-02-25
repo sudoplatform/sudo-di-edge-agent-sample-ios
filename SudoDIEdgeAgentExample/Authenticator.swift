@@ -6,7 +6,7 @@
 
 import SudoKeyManager
 import SudoUser
-// import AuthenticationServices
+import Foundation
 
 enum AuthenticatorError: LocalizedError {
     case registerFailed

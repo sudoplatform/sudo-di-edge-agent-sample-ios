@@ -11,6 +11,7 @@ import SudoKeyManager
 import SudoLogging
 import SudoProfiles
 import SudoUser
+import Foundation
 
 class Clients {
     static private(set) var agent: SudoDIEdgeAgent!
@@ -84,6 +85,7 @@ class Clients {
         self.agent = try SudoDIEdgeAgentBuilder()
             .setAgentConfiguration(agentConfiguration: self.agentConfiguration)
             .setLogger(logger: logger)
+            .registerExternalCryptoProvider(provider: IOSHardwareCryptoProvider())
             .build()
     }
 

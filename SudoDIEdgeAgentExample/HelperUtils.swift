@@ -5,6 +5,18 @@
 //
 
 import Foundation
+import SwiftUI
+import SudoDIEdgeAgent
+
+extension View {
+    @inlinable func standardButtonTheme() -> some View {
+        return self.padding()
+            .frame(width: 200)
+            .background(.blue)
+            .foregroundStyle(.white)
+            .clipShape(Capsule())
+    }
+}
 
 @propertyWrapper struct UserDefaultsBacked<Value> {
     let key: String
@@ -44,6 +56,19 @@ extension Sequence {
     }
 }
 
+extension Dictionary {
+    func asyncCompactMap<T>(_ transform: (Key, Value) async throws -> T?) async rethrows -> [Key: T] {
+        var values = [Key: T]()
+        for (k, v) in self {
+            if let transformed = try await transform(k, v) {
+                values[k] = transformed
+            }
+        }
+
+        return values
+    }
+}
+
 extension String: LocalizedError {
     public var errorDescription: String? { return self }
 }
@@ -61,6 +86,33 @@ class PreviewDataHelper {
             .init(name: "family_name", value: "Doe", mimeType: nil)
         ]
     ))
+    
+    static let dummyW3cCredential = W3cCredential(
+        contexts: [],
+        id: nil,
+        types: ["VerifiableCredential", "Sample"],
+        credentialSubject: [
+            .init(
+                id: "did:example:123",
+                properties: [
+                    "givenName": .string("John"),
+                    "familyName": .string("Smith")
+                ]
+            ),
+            .init(
+                id: "did:example:321",
+                properties: [
+                    "givenName": .string("Peter"),
+                    "familyName": .string("Griffin")
+                ]
+            )
+        ],
+        issuer: .init(id: "did:example:issuer123", properties: [:]),
+        issuanceDate: "2024-02-12T15:30:45.123Z",
+        expirationDate: nil,
+        proof: [],
+        properties: [:]
+    )
     
     static let dummyUICredentialW3C = UICredential.w3c(.init(
         id: "2",
@@ -104,6 +156,7 @@ class PreviewDataHelper {
             validAfter: nil,
             validBefore: nil,
             issuedAt: 1731369621,
+            subject: "did:foo:sub",
             keyBinding: nil,
             claims: [
                 "given_name": .string(canSelectiveDisclose: true, data: "Hello"),

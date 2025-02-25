@@ -14,8 +14,12 @@ struct HomeView: View {
             List {
                 Button(action: viewModel.changeAgentState) {
                     viewModel.serverState == .stopped
-                    ? Text("Run Agent")
-                    : Text("Stop Agent")
+                    ? Text("Start DIDComm")
+                    : Text("Stop DIDComm")
+                }
+
+                NavigationLink("DIDs") {
+                    DidListView()
                 }
 
                 NavigationLink("Connection Exchanges") {

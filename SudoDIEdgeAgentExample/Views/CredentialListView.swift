@@ -51,11 +51,7 @@ struct CredentialListView: View {
                         Text("Refresh")
                     }
                 }
-                .padding()
-                .frame(width: 200)
-                .background(.blue)
-                .foregroundStyle(.white)
-                .clipShape(Capsule())
+                .standardButtonTheme()
                 .disabled(viewModel.isLoading)
             }
             .navigationTitle("Credentials")
